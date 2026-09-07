@@ -7,7 +7,7 @@
    versión vieja que tiene guardada.
    ============================================================ */
 
-const VERSION = "refugio-theo-v6";
+const VERSION = "refugio-theo-v7";
 
 const ARCHIVOS = [
   "./",
