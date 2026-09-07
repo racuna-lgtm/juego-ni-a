@@ -4,27 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#FFD9E8">
+<meta name="description" content="Juego de repaso escolar de 2° básico">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icono.svg">
 <title>El Refugio de Theo</title>
 <style>
 /* ============================================================
-   EL REFUGIO DE THEO  ·  v2
-   Juego educativo 2° básico (Bases Curriculares, Mineduc Chile)
-   Un solo archivo. Funciona sin internet. Sin base de datos.
-   El progreso se guarda en el celular (localStorage).
+   EL REFUGIO DE THEO · v3
+   Juego de repaso de 2° básico (Bases Curriculares, Mineduc).
+   Funciona sin internet. Todo se guarda en el propio dispositivo.
    ============================================================ */
 
 :root{
   --rosa-fondo:#FFE7F1;
-  --rosa-fuerte:#FF5C9E;
+  --rosa:#E13B84;          /* contraste suficiente para texto blanco */
   --rosa-suave:#FFC2DA;
-  --lila:#B98CFF;
+  --lila:#7C4DD6;
   --crema:#FFF9FC;
-  --texto:#4A2C3F;
-  --texto-suave:#8A6C7C;
-  --menta:#4FC79A;
-  --sol:#FFC53D;
-  --sombra:0 6px 0 rgba(255,92,158,.22);
-  --fuente: "Comic Sans MS", "Chalkboard SE", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --texto:#40232F;
+  --texto-suave:#6E5260;
+  --menta:#1E9E63;
+  --acento:#E13B84;        /* cambia según la materia de la misión */
+  --acento-claro:#FFEAF3;
+  --fuente:"Comic Sans MS","Chalkboard SE","Segoe UI",system-ui,-apple-system,sans-serif;
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -44,8 +47,8 @@ body{
 }
 
 #app{
-  max-width:520px; margin:0 auto;
-  padding:14px 16px calc(24px + env(safe-area-inset-bottom));
+  max-width:540px; margin:0 auto;
+  padding:14px 16px calc(28px + env(safe-area-inset-bottom));
   min-height:100vh; display:flex; flex-direction:column;
 }
 
@@ -53,77 +56,91 @@ body{
 .pantalla.activa{display:flex; animation:aparece .28s ease;}
 @keyframes aparece{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
 
-.barra{display:flex; align-items:center; gap:8px; margin-bottom:10px; min-height:44px;}
+.barra{display:flex; align-items:center; gap:8px; margin-bottom:10px; min-height:48px;}
 .barra .espacio{flex:1;}
 .chip{
   background:var(--crema); border:3px solid var(--rosa-suave); border-radius:999px;
-  padding:6px 14px; font-size:17px; font-weight:bold; color:var(--rosa-fuerte);
+  padding:7px 15px; font-size:17px; font-weight:bold; color:var(--texto);
   display:inline-flex; align-items:center; gap:6px;
 }
 .btn-icono{
   background:var(--crema); border:3px solid var(--rosa-suave); border-radius:999px;
-  width:46px; height:46px; font-size:20px; cursor:pointer; line-height:1;
+  min-width:50px; height:50px; font-size:21px; cursor:pointer; line-height:1;
   display:flex; align-items:center; justify-content:center; color:var(--texto);
 }
 .btn-icono:active{transform:scale(.94);}
+.btn-icono:focus-visible, .btn:focus-visible, .mini:focus-visible, input:focus-visible, .cosa:focus-visible{
+  outline:4px solid #1B7FD4; outline-offset:3px;
+}
 
 .theo{display:flex; align-items:flex-end; gap:10px; margin:6px 0 14px;}
 .theo .cara{
   font-size:52px; line-height:1; flex:0 0 auto;
-  filter:drop-shadow(0 3px 0 rgba(255,92,158,.25));
+  filter:drop-shadow(0 3px 0 rgba(225,59,132,.2));
   animation:respira 2.6s ease-in-out infinite;
 }
 @keyframes respira{0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-5px) rotate(2deg);}}
 .globo{
-  background:var(--crema); border:3px solid var(--rosa-suave); border-radius:22px;
+  background:var(--crema); border:3px solid var(--acento); border-radius:22px;
   padding:12px 16px; font-size:19px; line-height:1.35; position:relative; flex:1;
 }
 .globo::after{
   content:""; position:absolute; left:-11px; bottom:14px; width:16px; height:16px;
-  background:var(--crema); border-left:3px solid var(--rosa-suave); border-bottom:3px solid var(--rosa-suave);
+  background:var(--crema); border-left:3px solid var(--acento); border-bottom:3px solid var(--acento);
   transform:rotate(45deg); border-radius:0 0 0 6px;
 }
 
-h1{font-size:34px; margin:4px 0 2px; color:var(--rosa-fuerte); text-align:center; line-height:1.1;}
+h1{font-size:34px; margin:4px 0 2px; color:var(--rosa); text-align:center; line-height:1.1;}
 h2{font-size:24px; margin:0 0 12px; text-align:center;}
 .subtitulo{text-align:center; color:var(--texto-suave); font-size:17px; margin:0 0 16px;}
 
 .btn{
   display:flex; align-items:center; gap:14px; width:100%;
-  background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px;
+  background:var(--crema); border:4px solid var(--acento); border-radius:26px;
   padding:16px 18px; font-family:var(--fuente); font-size:21px; color:var(--texto);
-  cursor:pointer; box-shadow:var(--sombra); margin-bottom:14px; text-align:left;
+  cursor:pointer; box-shadow:0 6px 0 rgba(0,0,0,.10); margin-bottom:14px; text-align:left;
   transition:transform .12s ease, background .2s ease, border-color .2s ease;
 }
-.btn:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(255,92,158,.22);}
-.btn .emoji{font-size:40px; line-height:1; flex:0 0 auto;}
+.btn:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.10);}
+.btn .emoji{font-size:52px; line-height:1; flex:0 0 auto;}
 .btn.principal{
-  background:var(--rosa-fuerte); color:#fff; border-color:#fff;
-  justify-content:center; font-size:26px; box-shadow:0 6px 0 #d63c7f;
+  background:var(--acento); color:#fff; border-color:#fff;
+  justify-content:center; font-size:25px; box-shadow:0 6px 0 rgba(0,0,0,.22);
 }
-.btn.suave{background:var(--lila); color:#fff; border-color:#fff; justify-content:center; box-shadow:0 6px 0 #8f60d8;}
+.btn.suave{background:var(--lila); color:#fff; border-color:#fff; justify-content:center; box-shadow:0 6px 0 rgba(0,0,0,.22);}
 .btn:disabled{cursor:default;}
-.btn.correcta{background:#DFF7EC; border-color:var(--menta); animation:brinca .5s ease;}
-.btn.fallida{opacity:.45; border-color:#e3d3db; background:#f4eef1; animation:tiembla .35s ease;}
+.btn.correcta{background:#DCF5E9; border-color:var(--menta); animation:brinca .5s ease;}
+.btn.fallida{opacity:.4; border-color:#ddd0d8; background:#f4eef1; animation:tiembla .35s ease;}
 @keyframes brinca{0%,100%{transform:scale(1);} 40%{transform:scale(1.06);}}
 @keyframes tiembla{0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);}}
 
-.mision{position:relative;}
-.mision .listo{position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:26px;}
+#opciones.doble{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+#opciones.doble .btn{
+  flex-direction:column; gap:6px; text-align:center; margin-bottom:0;
+  padding:16px 10px; font-size:19px;
+}
+#opciones.doble .btn .emoji{font-size:56px;}
 
-.puntos{display:flex; justify-content:center; gap:9px; margin:2px 0 14px;}
-.punto{width:15px; height:15px; border-radius:50%; background:#fff; border:3px solid var(--rosa-suave);}
-.punto.hecho{background:var(--sol); border-color:var(--sol);}
-.punto.ahora{background:var(--rosa-fuerte); border-color:var(--rosa-fuerte); transform:scale(1.25);}
+.mision{position:relative;}
+.mision .listo{position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:28px;}
+.mision .avance{display:block; font-size:14px; color:var(--texto-suave); margin-top:2px;}
+
+.progreso{text-align:center; margin:0 0 12px; font-size:17px; color:var(--texto-suave);}
+.huellas{font-size:22px; letter-spacing:4px; display:block; margin-top:2px;}
+.huellas .off{opacity:.25;}
 
 .enunciado{
-  background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px;
-  padding:18px; text-align:center; font-size:22px; line-height:1.35; margin-bottom:14px;
+  background:var(--crema); border:4px solid var(--acento); border-radius:26px;
+  padding:18px; text-align:center; font-size:22px; line-height:1.4; margin-bottom:14px;
 }
 .visual{font-size:34px; line-height:1.5; margin-top:10px; word-spacing:4px;}
 .cita{
-  display:block; margin-top:10px; font-size:19px; color:var(--texto-suave);
-  background:#FFF0F6; border-radius:16px; padding:10px 12px; line-height:1.4;
+  display:block; font-size:20px; color:var(--texto); line-height:1.5;
+  background:var(--acento-claro); border-radius:16px; padding:12px 14px; text-align:left;
+}
+.explica{
+  background:#DCF5E9; border:3px solid var(--menta); border-radius:22px;
+  padding:14px 16px; font-size:19px; line-height:1.4; margin-bottom:14px;
 }
 
 .premio{position:fixed; inset:0; display:none; align-items:center; justify-content:center; pointer-events:none; z-index:50;}
@@ -135,6 +152,11 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
   100%{transform:scale(1) rotate(0); opacity:0;}
 }
 
+.decoracion{
+  background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px;
+  padding:14px; font-size:38px; text-align:center; line-height:1.4; margin-bottom:14px; min-height:70px;
+}
+.decoracion .nada{font-size:16px; color:var(--texto-suave);}
 .refugio{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
 .jaula{background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px; padding:14px 10px; text-align:center;}
 .jaula .bicho{font-size:52px; line-height:1.1;}
@@ -143,24 +165,44 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 .jaula.vacia{background:#FBF0F5; border-style:dashed; border-color:#E7CBD9;}
 .jaula.vacia .bicho{filter:grayscale(1); opacity:.35;}
 
-.tarjeta{background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px; padding:18px; margin-bottom:14px; font-size:20px; line-height:1.4;}
-.tarjeta .etiqueta{color:var(--rosa-fuerte); font-size:17px; display:block; margin-bottom:6px;}
+.tienda{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.cosa{
+  background:var(--crema); border:4px solid var(--rosa-suave); border-radius:24px;
+  padding:12px 8px; text-align:center; font-family:var(--fuente); font-size:16px;
+  color:var(--texto); cursor:pointer;
+}
+.cosa .e{font-size:46px; display:block; line-height:1.1;}
+.cosa .precio{display:block; margin-top:4px; font-weight:bold; color:var(--rosa);}
+.cosa.tengo{background:#DCF5E9; border-color:var(--menta); cursor:default;}
+.cosa.lejos{opacity:.55;}
 
-.adultos{font-size:16px; line-height:1.5;}
+.tarjeta{background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px; padding:18px; margin-bottom:14px; font-size:20px; line-height:1.45;}
+.tarjeta .etiqueta{color:var(--rosa); font-size:17px; display:block; margin-bottom:6px;}
+
+.campo{
+  width:100%; padding:16px; font-family:var(--fuente); font-size:24px; text-align:center;
+  border:4px solid var(--rosa-suave); border-radius:24px; background:var(--crema); color:var(--texto);
+}
+
+.adultos{font-size:16px; line-height:1.55;}
 .adultos p{background:var(--crema); border-radius:18px; padding:14px; border:3px solid var(--rosa-suave);}
 .mini{
   background:var(--crema); border:3px solid var(--rosa-suave); border-radius:18px;
-  padding:12px 14px; font-family:var(--fuente); font-size:17px; color:var(--texto);
+  padding:13px 14px; font-family:var(--fuente); font-size:17px; color:var(--texto);
   width:100%; margin-bottom:10px; cursor:pointer; text-align:center;
 }
+.reporte{width:100%; border-collapse:collapse; font-size:15px; background:var(--crema); border-radius:18px; overflow:hidden;}
+.reporte th,.reporte td{padding:9px 10px; text-align:left; border-bottom:1px solid #F0DDE6;}
+.reporte th{background:#F7E7EF; font-size:14px;}
+.reporte td.n{text-align:right; white-space:nowrap;}
 
 #aviso{
-  position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(120%);
+  position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(140%);
   background:var(--texto); color:#fff; padding:13px 18px; border-radius:18px;
   font-size:16px; max-width:88%; text-align:center; z-index:80; transition:transform .3s ease;
 }
 #aviso.ver{transform:translateX(-50%) translateY(0);}
-#aviso.malo{background:#C0392B;}
+#aviso.malo{background:#A62B1F;}
 
 .pie{text-align:center; color:var(--texto-suave); font-size:14px; margin-top:auto; padding-top:16px;}
 
@@ -171,30 +213,46 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 
 <div id="app">
 
-  <!-- ================= INICIO ================= -->
-  <section class="pantalla activa" id="p-inicio">
+  <!-- ============ BIENVENIDA (solo la primera vez) ============ -->
+  <section class="pantalla" id="p-hola">
+    <div style="text-align:center; margin-top:20px;">
+      <div style="font-size:96px; line-height:1;">🐶</div>
+      <h1>¡Hola!</h1>
+      <p class="subtitulo">Soy Theo. ¿Cómo te llamas?</p>
+    </div>
+    <input class="campo" id="campo-nombre" type="text" maxlength="14" autocomplete="off"
+           placeholder="Escribe tu nombre" aria-label="Tu nombre">
+    <div style="margin-top:16px;">
+      <button class="btn principal" id="btn-guardar-nombre">¡Listo! ✨</button>
+      <button class="mini" id="btn-sin-nombre">Prefiero no poner mi nombre</button>
+    </div>
+    <div class="pie">Tu nombre se queda solo en este dispositivo.</div>
+  </section>
+
+  <!-- ============ INICIO ============ -->
+  <section class="pantalla" id="p-inicio">
     <div class="barra">
       <span class="espacio"></span>
-      <button class="btn-icono" id="btn-sonido" aria-label="Sonido">🔊</button>
+      <button class="btn-icono" id="btn-sonido" aria-label="Activar o silenciar el sonido">🔊</button>
     </div>
-    <div style="text-align:center; margin-top:10px;">
-      <div style="font-size:96px; line-height:1;">🐶</div>
+    <div style="text-align:center; margin-top:6px;">
+      <div style="font-size:92px; line-height:1;">🐶</div>
       <h1>El Refugio<br>de Theo</h1>
-      <p class="subtitulo">Juega, aprende y llena tu refugio de amiguitos</p>
+      <p class="subtitulo" id="saludo-inicio">Juega, aprende y llena tu refugio de amiguitos</p>
     </div>
-    <div style="margin-top:14px;">
+    <div style="margin-top:12px;">
       <button class="btn principal" id="btn-jugar">¡Jugar! ✨</button>
       <button class="btn suave" id="btn-ver-refugio">Mi refugio 🏡</button>
     </div>
     <div class="pie">Hecho con cariño para ti 💗<br>
-      <button class="mini" id="btn-adultos" style="margin-top:10px; width:auto; padding:8px 16px;">Para adultos</button>
+      <button class="mini" id="btn-adultos" style="margin-top:10px; width:auto; padding:9px 18px;">Para adultos</button>
     </div>
   </section>
 
-  <!-- ================= MAPA ================= -->
+  <!-- ============ MAPA ============ -->
   <section class="pantalla" id="p-mapa">
     <div class="barra">
-      <button class="btn-icono" data-ir="p-inicio" aria-label="Volver">🏠</button>
+      <button class="btn-icono" data-ir="p-inicio" aria-label="Volver al inicio">🏠</button>
       <span class="espacio"></span>
       <span class="chip" id="chip-estrellas">⭐ 0</span>
     </div>
@@ -205,24 +263,26 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
     <div id="lista-misiones"></div>
   </section>
 
-  <!-- ================= PREGUNTA ================= -->
+  <!-- ============ PREGUNTA ============ -->
   <section class="pantalla" id="p-juego">
     <div class="barra">
-      <button class="btn-icono" id="btn-salir-mision" aria-label="Volver al mapa">🏡</button>
+      <button class="btn-icono" id="btn-salir-mision" aria-label="Dejar la misión">✖️</button>
       <span class="espacio"></span>
       <span class="chip" id="chip-materia">Misión</span>
+      <button class="btn-icono" id="btn-sonido-juego" aria-label="Activar o silenciar el sonido">🔊</button>
     </div>
-    <div class="puntos" id="puntos"></div>
+    <p class="progreso" id="progreso"></p>
     <div class="theo">
       <div class="cara" id="cara-theo">🐶</div>
-      <div class="globo" id="globo-juego">¡Vamos!</div>
+      <div class="globo" id="globo-juego" aria-live="polite">¡Vamos!</div>
     </div>
     <div class="enunciado" id="enunciado"></div>
+    <div id="explicacion"></div>
     <div id="opciones"></div>
     <div id="zona-siguiente"></div>
   </section>
 
-  <!-- ================= PAUSA ================= -->
+  <!-- ============ PAUSA ============ -->
   <section class="pantalla" id="p-pausa">
     <div class="theo">
       <div class="cara">🐶</div>
@@ -230,15 +290,16 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
     </div>
     <div id="premio-animal" style="text-align:center; margin-bottom:16px;"></div>
     <div class="tarjeta"><span class="etiqueta">Un chiste 😄</span><span id="chiste"></span></div>
-    <div class="tarjeta"><span class="etiqueta">¿Sabías que...? 💡</span><span id="dato"></span></div>
+    <button class="mini" id="btn-dato">Cuéntame algo curioso 💡</button>
+    <div id="zona-dato"></div>
     <button class="btn principal" id="btn-seguir">Seguir jugando ➜</button>
     <button class="btn suave" id="btn-a-refugio">Ver mi refugio 🏡</button>
   </section>
 
-  <!-- ================= REFUGIO ================= -->
+  <!-- ============ REFUGIO ============ -->
   <section class="pantalla" id="p-refugio">
     <div class="barra">
-      <button class="btn-icono" data-ir="p-mapa" aria-label="Volver">⬅️</button>
+      <button class="btn-icono" data-ir="p-mapa" aria-label="Volver a las misiones">⬅️</button>
       <span class="espacio"></span>
       <span class="chip" id="chip-estrellas-2">⭐ 0</span>
     </div>
@@ -247,322 +308,100 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       <div class="cara">🐶</div>
       <div class="globo" id="globo-refugio">Aquí viven todos tus amiguitos.</div>
     </div>
+    <div class="decoracion" id="decoracion"></div>
     <div class="refugio" id="grid-refugio"></div>
     <div style="margin-top:16px;">
-      <button class="btn principal" data-ir="p-mapa">Ir a las misiones ✨</button>
+      <button class="btn principal" id="btn-tienda">Tienda de Theo 🛍️</button>
+      <button class="btn suave" data-ir="p-mapa">Ir a las misiones ✨</button>
     </div>
   </section>
 
-  <!-- ================= ADULTOS ================= -->
+  <!-- ============ TIENDA ============ -->
+  <section class="pantalla" id="p-tienda">
+    <div class="barra">
+      <button class="btn-icono" data-ir="p-refugio" aria-label="Volver al refugio">⬅️</button>
+      <span class="espacio"></span>
+      <span class="chip" id="chip-estrellas-3">⭐ 0</span>
+    </div>
+    <h2>Tienda de Theo 🛍️</h2>
+    <div class="theo">
+      <div class="cara">🐶</div>
+      <div class="globo" id="globo-tienda">Con tus estrellas puedes comprar cosas para el refugio.</div>
+    </div>
+    <div class="tienda" id="grid-tienda"></div>
+  </section>
+
+  <!-- ============ ADULTOS ============ -->
   <section class="pantalla" id="p-adultos">
     <div class="barra">
-      <button class="btn-icono" data-ir="p-inicio" aria-label="Volver">⬅️</button>
+      <button class="btn-icono" data-ir="p-inicio" aria-label="Volver al inicio">⬅️</button>
       <span class="espacio"></span>
     </div>
     <h2>Para adultos</h2>
     <div class="adultos">
-      <p><strong>Contenido</strong><br>
-      152 preguntas (30 o 31 por asignatura) basadas en los Objetivos de Aprendizaje de
-      2° básico de las Bases Curriculares del Mineduc: Lenguaje, Matemática, Ciencias
-      Naturales, Historia y Geografía. Inglés sigue la propuesta curricular de 1° a 4°
-      básico (esa asignatura es obligatoria recién desde 5° básico). Cada misión toma 5
-      preguntas y el juego lleva la cuenta de las que ya salieron, así que no se repiten
-      hasta haber recorrido las 30 de esa asignatura.</p>
-      <p><strong>¿Dónde se guarda el progreso?</strong><br>
-      Solo en este celular o computador, dentro del navegador. No se envía nada a internet
-      y no hay ninguna cuenta ni base de datos. <strong>Si se borra el historial o los datos
-      del navegador, el refugio se pierde.</strong> Para conservarlo, usa el respaldo.</p>
+      <p><strong>Cómo va</strong><br>
+      Cuántas preguntas distintas ha respondido de cada asignatura y en qué temas
+      necesitó más de un intento. No es una nota: es solo para saber qué reforzar.</p>
+      <div id="reporte"></div>
+      <p style="margin-top:14px;"><strong>El contenido</strong><br>
+      261 preguntas basadas en los Objetivos de Aprendizaje de 2° básico del Mineduc:
+      Lenguaje, Matemática, Ciencias Naturales, e Historia y Geografía. Inglés sigue la
+      propuesta curricular de 1° a 4° básico, porque esa asignatura es obligatoria recién
+      desde 5° básico. Las preguntas no se repiten hasta recorrer toda la asignatura, y
+      las que le costaron vuelven a aparecer un par de misiones después.</p>
+      <p><strong>Dónde se guardan los datos</strong><br>
+      Solo en este dispositivo, dentro del navegador. No se envía nada a internet, no hay
+      cuenta ni base de datos. <strong>Si se borran los datos del navegador, el refugio se
+      pierde.</strong> Para conservarlo, usa el respaldo.</p>
       <button class="mini" id="btn-exportar">💾 Guardar un respaldo</button>
       <button class="mini" id="btn-importar">📂 Recuperar un respaldo</button>
       <input type="file" id="archivo-importar" accept="application/json,.json" hidden>
-      <button class="mini" id="btn-reiniciar" style="border-color:#E9A5A5; color:#B03A3A;">🧹 Empezar de nuevo</button>
-      <p style="margin-top:14px;"><strong>Cómo está pensado el juego</strong><br>
+      <button class="mini" id="btn-reiniciar" style="border-color:#D79A9A; color:#A62B1F;">🧹 Empezar de nuevo</button>
+      <p style="margin-top:14px;"><strong>Cómo está pensado</strong><br>
       Una pregunta por pantalla, sin cronómetro y sin puntaje que baje. Los errores no
-      restan: la opción equivocada se apaga con un mensaje de ánimo y se puede reintentar
-      las veces que quiera. Las misiones son de 5 preguntas y entre una y otra hay una
-      pausa. Los sonidos suenan solo al acertar y al terminar una misión, y se pueden
-      silenciar con el botón 🔊 de la pantalla de inicio.</p>
+      restan: la opción equivocada se apaga con un mensaje de ánimo y puede reintentar las
+      veces que quiera. Al acertar, Theo explica en una línea por qué esa era la respuesta.
+      Las misiones son de 5 preguntas y a la tercera seguida Theo propone dejarlo para
+      mañana. Los sonidos suenan solo al acertar y al terminar una misión.</p>
     </div>
   </section>
 
 </div>
 
 <div class="premio" id="premio"><span>⭐</span></div>
-<div id="aviso"></div>
+<div id="aviso" role="status"></div>
 
+<script src="./datos.js"></script>
 <script>
 "use strict";
 
 /* ============================================================
-   1. CONTENIDO
-   p = enunciado · v = apoyo visual · t = texto breve para leer
-   o = opciones [dibujo, texto] · c = índice de la respuesta correcta
-   IMPORTANTE: no reordenar las preguntas dentro de cada materia.
-   El sistema anti-repetición guarda el índice de las ya vistas.
-   ============================================================ */
-
-const MATERIAS = [
-  {
-    id:"lenguaje", nombre:"Lenguaje", emoji:"📚",
-    animal:{ e:"🦄", nombre:"Luna", tipo:"unicornia" },
-    preguntas:[
-      /* Ortografía y lectura (LE02 OA 01 / OA 21) */
-      {p:"¿Cuál palabra se escribe con RR?", o:[["🐕","Perro"],["🌸","Flor"],["🌙","Luna"]], c:0},
-      {p:"¿Cuál palabra lleva GUI o GUE?", o:[["🎸","Guitarra"],["🐱","Gato"],["🍞","Pan"]], c:0},
-      {p:"¿Cuál palabra lleva QUE o QUI?", o:[["🧀","Queso"],["🏠","Casa"],["🌳","Árbol"]], c:0},
-      {p:"¿Cuál palabra lleva CE o CI?", o:[["☁️","Cielo"],["🐄","Vaca"],["🥕","Zanahoria"]], c:0},
-      {p:"¿Cuál oración está bien escrita?", o:[["🩷","Mi perro se llama Theo."],["💜","mi perro se llama theo"],["💙","Mi perro se llama theo"]], c:0},
-      {p:"¿Qué signo le falta a esta pregunta?", v:"___ Cómo te llamas?", o:[["🩷","El signo ¿"],["💜","El signo ¡"],["💙","Un punto ."]], c:0},
-      {p:"Una oración siempre termina con...", o:[["🩷","Un punto ."],["💜","Una coma ,"],["💙","Un guion -"]], c:0},
-      {p:"Los nombres de las personas se escriben...", o:[["🩷","Con mayúscula al principio"],["💜","Todo en minúscula"],["💙","Todo en mayúscula"]], c:0},
-      {p:"¿En cuál palabra suenan dos consonantes juntitas?", o:[["🌸","Flor"],["🌙","Luna"],["🐱","Gato"]], c:0},
-      /* Gramática (LE02 OA 19 / OA 20) */
-      {p:"¿Cuál de estas palabras es un sustantivo, o sea, nombra algo?", o:[["🐰","Conejo"],["🏃","Correr"],["😊","Alegre"]], c:0},
-      {p:"¿Cuál palabra es un adjetivo, o sea, dice cómo es algo?", o:[["😊","Alegre"],["🐶","Perro"],["🦘","Saltar"]], c:0},
-      {p:"¿Cuál palabra es una acción?", o:[["🏃","Correr"],["🌸","Flor"],["🩷","Rosado"]], c:0},
-      {p:"En «el gato negro», ¿qué palabra dice CÓMO es el gato?", o:[["🩷","Negro"],["💜","Gato"],["💙","El"]], c:0},
-      {p:"¿Cuál es el plural de FLOR?", o:[["🩷","Flores"],["💜","Florcita"],["💙","Flor"]], c:0},
-      {p:"¿Cuál es el plural de LÁPIZ?", o:[["🩷","Lápices"],["💜","Lápizes"],["💙","Lápiz"]], c:0},
-      {p:"¿Qué palabrita va antes de «unicornio»?", o:[["🩷","El unicornio"],["💜","La unicornio"],["💙","Las unicornio"]], c:0},
-      {p:"¿Qué palabrita va antes de «casa»?", o:[["🩷","La casa"],["💜","El casa"],["💙","Los casa"]], c:0},
-      /* Comprensión lectora (LE02 OA 05 / OA 07) */
-      {p:"¿Cómo se sintió Sofía al principio?", t:"Sofía perdió su muñeca y se puso a llorar. Su hermano la ayudó a buscar y la encontraron debajo de la cama.", o:[["😢","Triste"],["😀","Contenta"],["😡","Enojada"]], c:0},
-      {p:"¿Dónde estaba la muñeca?", t:"Sofía perdió su muñeca y se puso a llorar. Su hermano la ayudó a buscar y la encontraron debajo de la cama.", o:[["🛏️","Debajo de la cama"],["🚪","Detrás de la puerta"],["🌳","En el patio"]], c:0},
-      {p:"¿Qué hizo Theo PRIMERO?", t:"Theo corrió al parque, saltó la reja y se comió la galleta de Ana.", o:[["🏃","Corrió al parque"],["🍪","Se comió la galleta"],["🦘","Saltó la reja"]], c:0},
-      {p:"¿Por qué Emilia no salió a jugar?", t:"Llovía tanto que Emilia no pudo salir a jugar. Se quedó leyendo un cuento al lado de la ventana.", o:[["🌧️","Porque estaba lloviendo"],["😴","Porque tenía sueño"],["📚","Porque no le gusta jugar"]], c:0},
-      {p:"¿Qué tipo de texto es este?", t:"El zorro vio unas uvas muy altas y, como no las alcanzó, dijo que estaban verdes.", o:[["🦊","Una fábula"],["📰","Una noticia"],["🍲","Una receta"]], c:0},
-      {p:"¿Qué texto te sirve para preparar una torta?", o:[["🍰","Una receta"],["🎵","Una canción"],["📜","Una leyenda"]], c:0},
-      {p:"¿Para qué sirve un poema?", o:[["🎵","Para contar sentimientos con rimas"],["📋","Para dar instrucciones"],["🧾","Para hacer una lista"]], c:0},
-      {p:"En los cuentos, ¿quiénes son los personajes?", o:[["🧚","Los que viven la historia"],["🗺️","El lugar donde pasa"],["⏰","La hora en que pasa"]], c:0},
-      /* Vocabulario, rimas y adivinanzas (LE02 OA 11 / OA 30) */
-      {p:"¿Qué palabra significa lo MISMO que «contento»?", o:[["😊","Feliz"],["😢","Triste"],["😴","Dormido"]], c:0},
-      {p:"¿Qué palabra significa lo CONTRARIO de «grande»?", o:[["🐜","Pequeño"],["🐘","Enorme"],["🦒","Alto"]], c:0},
-      {p:"¿Qué palabra significa lo CONTRARIO de «sucio»?", o:[["🧼","Limpio"],["🗑️","Manchado"],["🌧️","Mojado"]], c:0},
-      {p:"Adivinanza: vuelo de flor en flor, tengo alas de colores y antes fui una oruga.", o:[["🦋","La mariposa"],["🐝","La abeja"],["🐦","El pájaro"]], c:0},
-      {p:"¿Qué palabra rima con CORAZÓN?", o:[["🐭","Ratón"],["🌸","Flor"],["☀️","Sol"]], c:0},
-      {p:"¿Cuál palabra tiene MÁS sílabas?", v:"bi-ci-cle-ta · ga-to · sol", o:[["🚲","Bicicleta"],["🐱","Gato"],["☀️","Sol"]], c:0}
-    ]
-  },
-
-  {
-    id:"matematica", nombre:"Matemática", emoji:"🔢",
-    animal:{ e:"🐰", nombre:"Coco", tipo:"conejita" },
-    preguntas:[
-      /* Números hasta 100, decenas y unidades (MA02 OA 02 / OA 05 / OA 07) */
-      {p:"Un grupo de 10 y 3 sueltas. ¿Cuántas manzanas hay?", v:"🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎 + 🍎🍎🍎", o:[["🩷","13"],["💜","30"],["💙","103"]], c:0},
-      {p:"En el número 47, ¿cuántas DECENAS hay?", v:"4 grupos de 10 y 7 sueltas", o:[["🩷","4 decenas"],["💜","7 decenas"],["💙","47 decenas"]], c:0},
-      {p:"3 decenas y 5 unidades forman el número...", v:"🔟🔟🔟 + ⭐⭐⭐⭐⭐", o:[["🩷","35"],["💜","53"],["💙","305"]], c:0},
-      {p:"¿Cuál número es MAYOR?", v:"45  ·  54", o:[["🩷","54"],["💜","45"],["💙","Son iguales"]], c:0},
-      {p:"¿Cuál número es MENOR?", v:"62  ·  26", o:[["🩷","26"],["💜","62"],["💙","Son iguales"]], c:0},
-      {p:"¿Cómo se lee el número 80?", o:[["🩷","Ochenta"],["💜","Ocho"],["💙","Dieciocho"]], c:0},
-      /* Sumas y restas (MA02 OA 06 / OA 09) */
-      {p:"20 + 30 = ?", v:"🔟🔟 + 🔟🔟🔟", o:[["🩷","50"],["💜","60"],["💙","23"]], c:0},
-      {p:"25 + 4 = ?", v:"25 galletas 🍪 y llegan 4 más", o:[["🩷","29"],["💜","21"],["💙","30"]], c:0},
-      {p:"18 − 5 = ?", v:"Tenías 18 stickers ✨ y regalaste 5", o:[["🩷","13"],["💜","23"],["💙","12"]], c:0},
-      {p:"El DOBLE de 7 es...", v:"7 + 7", o:[["🩷","14"],["💜","12"],["💙","7"]], c:0},
-      {p:"¿Cuánto le falta al 6 para llegar a 10?", v:"6 + ___ = 10", o:[["🩷","4"],["💜","6"],["💙","16"]], c:0},
-      {p:"Había 30 lápices y se perdieron 10. ¿Cuántos quedan?", v:"🔟🔟🔟 − 🔟", o:[["🩷","20"],["💜","40"],["💙","10"]], c:0},
-      /* Multiplicación como suma iterada, tablas 2, 5 y 10 (MA02 OA 11) */
-      {p:"Hay 3 platos con 2 galletas cada uno. ¿Cuántas galletas son?", v:"🍪🍪 · 🍪🍪 · 🍪🍪", o:[["🩷","6"],["💜","5"],["💙","3"]], c:0},
-      {p:"3 manos con 5 dedos cada una. ¿Cuántos dedos son?", v:"🖐️ 🖐️ 🖐️", o:[["🩷","15"],["💜","10"],["💙","8"]], c:0},
-      {p:"4 cajas con 10 lápices cada una. ¿Cuántos lápices son?", v:"🔟 🔟 🔟 🔟", o:[["🩷","40"],["💜","14"],["💙","400"]], c:0},
-      {p:"2 × 5 significa...", o:[["🩷","2 grupos de 5, o sea 10"],["💜","2 más 5, o sea 7"],["💙","2 menos 5"]], c:0},
-      {p:"5 + 5 + 5 + 5 = ?", v:"⭐⭐⭐⭐⭐ cuatro veces", o:[["🩷","20"],["💜","15"],["💙","25"]], c:0},
-      /* Patrones (MA02 OA 12) */
-      {p:"¿Qué número sigue en el patrón?", v:"5 · 10 · 15 · 20 · ?", o:[["🩷","25"],["💜","21"],["💙","30"]], c:0},
-      {p:"¿Qué número sigue en el patrón?", v:"10 · 20 · 30 · ?", o:[["🩷","40"],["💜","31"],["💙","50"]], c:0},
-      {p:"¿Qué figura sigue en el patrón?", v:"🔺 ⭕ 🔺 ⭕ ?", o:[["🔺","El triángulo"],["⭕","El círculo"],["🟦","El cuadrado"]], c:0},
-      /* Geometría (MA02 OA 15 / OA 16) */
-      {p:"¿Qué forma tiene una pelota?", v:"⚽", o:[["🩷","Una esfera"],["💜","Un cubo"],["💙","Un cono"]], c:0},
-      {p:"¿Qué forma tiene un dado?", v:"🎲", o:[["🩷","Un cubo"],["💜","Una esfera"],["💙","Un cono"]], c:0},
-      {p:"¿Qué forma tiene un gorrito de cumpleaños?", v:"🎉", o:[["🩷","Un cono"],["💜","Un cubo"],["💙","Una esfera"]], c:0},
-      {p:"¿Cuántos lados tiene un triángulo?", v:"🔺", o:[["🩷","3"],["💜","4"],["💙","5"]], c:0},
-      /* Medición: tiempo, calendario, longitud (MA02 OA 17 / OA 18 / OA 19) */
-      {p:"El reloj marca 3:00. ¿Qué hora es?", v:"🕒 3:00", o:[["🩷","Las tres en punto"],["💜","Las tres y media"],["💙","Las doce"]], c:0},
-      {p:"El reloj marca 7:30. ¿Qué hora es?", v:"🕢 7:30", o:[["🩷","Las siete y media"],["💜","Las siete en punto"],["💙","Las treinta"]], c:0},
-      {p:"¿Cuántos días tiene una semana?", v:"📅", o:[["🩷","7"],["💜","5"],["💙","30"]], c:0},
-      {p:"¿Qué día viene DESPUÉS del miércoles?", o:[["🩷","Jueves"],["💜","Martes"],["💙","Domingo"]], c:0},
-      {p:"¿Con qué medirías el largo de tu sala?", o:[["📏","Con metros"],["⚖️","Con kilos"],["⏰","Con minutos"]], c:0},
-      /* Dinero y datos (MA02 OA 03 / OA 22) */
-      {p:"Tienes una moneda de $100 y una de $50. ¿Cuánto tienes?", v:"🪙 $100 + 🪙 $50", o:[["🩷","$150"],["💜","$1050"],["💙","$50"]], c:0}
-    ]
-  },
-
-  {
-    id:"ciencias", nombre:"Ciencias Naturales", emoji:"🌿",
-    animal:{ e:"🐢", nombre:"Tomás", tipo:"tortuga" },
-    preguntas:[
-      /* Vertebrados e invertebrados (CN02 OA 01 / OA 02) */
-      {p:"El perro es un MAMÍFERO porque...", o:[["🐶","De guagua toma leche de su mamá"],["🥚","Pone huevos"],["🐟","Tiene escamas"]], c:0},
-      {p:"¿Cuál de estos animales es un AVE?", o:[["🦉","El búho"],["🐢","La tortuga"],["🐸","La rana"]], c:0},
-      {p:"¿Qué cubre el cuerpo de los peces?", o:[["🐟","Escamas"],["🪶","Plumas"],["🧶","Pelos"]], c:0},
-      {p:"¿Cuál de estos animales es un REPTIL?", o:[["🐍","La serpiente"],["🐦","El pájaro"],["🐬","El delfín"]], c:0},
-      {p:"La rana es un anfibio. Cuando nace es un renacuajo y vive...", o:[["💧","En el agua"],["🏜️","En el desierto"],["🌳","En los árboles"]], c:0},
-      {p:"¿Cuántas patas tiene un insecto?", v:"🐜", o:[["🩷","6 patas"],["💜","8 patas"],["💙","4 patas"]], c:0},
-      {p:"¿Cuántas patas tiene una araña?", v:"🕷️", o:[["🩷","8 patas"],["💜","6 patas"],["💙","2 patas"]], c:0},
-      {p:"El cangrejo pertenece al grupo de los...", v:"🦀", o:[["🩷","Crustáceos"],["💜","Insectos"],["💙","Arácnidos"]], c:0},
-      {p:"¿Cuál animal es INVERTEBRADO? (no tiene huesos en la espalda)", o:[["🐛","El gusano"],["🐱","El gato"],["🐦","El pájaro"]], c:0},
-      /* Ciclo de vida y hábitat (CN02 OA 03 / OA 04 / OA 05) */
-      {p:"Huevo, oruga, crisálida y... ¿qué falta?", v:"🥚 → 🐛 → 🛖 → ?", o:[["🦋","La mariposa"],["🐝","La abeja"],["🐞","La chinita"]], c:0},
-      {p:"¿Cuál de estos animales nace de un huevo?", o:[["🐣","La gallina"],["🐄","La vaca"],["🐕","El perro"]], c:0},
-      {p:"¿Dónde vive el pingüino?", o:[["🧊","En lugares muy fríos"],["🏜️","En el desierto"],["🌴","En la selva"]], c:0},
-      {p:"El hábitat es...", o:[["🏞️","El lugar donde vive un animal"],["🍽️","Lo que come un animal"],["😴","La hora en que duerme"]], c:0},
-      {p:"¿Cuál animal chileno está en peligro de extinción?", o:[["🦌","El huemul"],["🐄","La vaca"],["🐔","La gallina"]], c:0},
-      {p:"¿Dónde vive el cóndor?", o:[["🏔️","En la cordillera"],["🌊","En el fondo del mar"],["🏜️","Bajo la arena"]], c:0},
-      /* Cuerpo humano y vida sana (CN02 OA 07 / OA 08) */
-      {p:"¿Qué parte del cuerpo bombea la sangre?", o:[["❤️","El corazón"],["🫁","Los pulmones"],["🦴","El esqueleto"]], c:0},
-      {p:"¿Con qué parte del cuerpo respiramos?", o:[["🫁","Con los pulmones"],["❤️","Con el corazón"],["💪","Con los músculos"]], c:0},
-      {p:"¿A dónde llega la comida después de tragarla?", o:[["🍽️","Al estómago"],["🫁","A los pulmones"],["🧠","Al cerebro"]], c:0},
-      {p:"¿Qué sostiene nuestro cuerpo y protege por dentro?", o:[["🦴","El esqueleto"],["👕","La ropa"],["👃","La nariz"]], c:0},
-      {p:"¿Qué nos permite movernos y saltar?", o:[["💪","Los músculos"],["👀","Los ojos"],["👂","Los oídos"]], c:0},
-      {p:"Hacer ejercicio sirve para...", o:[["❤️","Fortalecer el corazón"],["😴","Cansar el corazón"],["🍭","Comer más dulces"]], c:0},
-      /* El agua (CN02 OA 09 / OA 10 / OA 11) */
-      {p:"El agua limpia es...", o:[["💧","Transparente y sin olor"],["🎨","De color rojo"],["🍬","Dulce como el azúcar"]], c:0},
-      {p:"Si dejo un vaso con agua en el congelador, el agua se convierte en...", o:[["🧊","Hielo, o sea sólida"],["💨","Vapor"],["🍦","Helado de crema"]], c:0},
-      {p:"Cuando el agua hierve en la olla, sale...", o:[["💨","Vapor, o sea agua en gas"],["🧊","Hielo"],["🪨","Piedra"]], c:0},
-      {p:"Si echo agua en un vaso, el agua...", o:[["🥛","Toma la forma del vaso"],["🧱","Queda en forma de cubo"],["🎈","Se convierte en globo"]], c:0},
-      {p:"¿Qué se disuelve en el agua?", o:[["🧂","La sal"],["🪨","Una piedra"],["🔑","Una llave"]], c:0},
-      {p:"En el ciclo del agua, el sol calienta el mar y el agua...", o:[["☀️","Se evapora y sube como vapor"],["🧊","Se congela"],["🕳️","Desaparece para siempre"]], c:0},
-      /* Tiempo atmosférico (CN02 OA 12 / OA 13 / OA 14) */
-      {p:"¿Qué instrumento mide la temperatura?", o:[["🌡️","El termómetro"],["⏰","El reloj"],["📏","La regla"]], c:0},
-      {p:"¿Qué instrumento mide cuánta lluvia cayó?", o:[["🌧️","El pluviómetro"],["⚖️","La balanza"],["🔭","El telescopio"]], c:0},
-      {p:"La lluvia, el granizo y la nieve se llaman...", o:[["🌨️","Precipitaciones"],["🌬️","Vientos"],["🌈","Arcoíris"]], c:0},
-      {p:"En otoño, muchos árboles...", o:[["🍂","Botan sus hojas"],["🌸","Se llenan de flores"],["🎄","Se llenan de luces"]], c:0}
-    ]
-  },
-
-  {
-    id:"historia", nombre:"Historia y Geografía", emoji:"🗺️",
-    animal:{ e:"🦙", nombre:"Lila", tipo:"llamita" },
-    preguntas:[
-      /* Pueblos originarios (HI02 OA 01 / OA 02 / OA 10) */
-      {p:"¿Qué pueblo originario vive principalmente en el sur de Chile?", o:[["🌿","El pueblo mapuche"],["🗿","El pueblo rapa nui"],["🏜️","El pueblo aimara"]], c:0},
-      {p:"¿Qué pueblo originario vive en Isla de Pascua?", o:[["🗿","El pueblo rapa nui"],["🌿","El pueblo mapuche"],["🦙","El pueblo aimara"]], c:0},
-      {p:"¿Qué pueblo originario vive en el altiplano del norte?", o:[["🦙","El pueblo aimara"],["🌿","El pueblo mapuche"],["🗿","El pueblo rapa nui"]], c:0},
-      {p:"Los moái, esas estatuas gigantes de piedra, fueron hechos por el pueblo...", v:"🗿", o:[["🩷","Rapa nui"],["💜","Mapuche"],["💙","Aimara"]], c:0},
-      {p:"¿Cómo se llama la casa tradicional del pueblo mapuche?", o:[["🏚️","La ruca"],["🏰","El castillo"],["⛺","La carpa"]], c:0},
-      {p:"El idioma del pueblo mapuche se llama...", o:[["🗣️","Mapudungun"],["🇬🇧","Inglés"],["🇮🇹","Italiano"]], c:0},
-      {p:"Un pueblo NÓMADA es el que...", o:[["🏕️","Se cambia de lugar buscando alimento"],["🌽","Vive siempre en el mismo lugar"],["🏙️","Vive en la ciudad"]], c:0},
-      {p:"Un pueblo SEDENTARIO es el que...", o:[["🌽","Se queda en un lugar y cultiva"],["🏕️","Anda de un lado a otro"],["⛵","Vive en un barco"]], c:0},
-      {p:"La papa, el maíz y el poroto son alimentos que nos dejaron...", o:[["🥔","Los pueblos originarios"],["🍕","Los italianos"],["🍣","Los japoneses"]], c:0},
-      {p:"Decimos que la sociedad chilena es MESTIZA porque mezcla...", o:[["🤝","Pueblos originarios y españoles"],["🐶","Animales y plantas"],["🌊","Mar y cordillera"]], c:0},
-      /* Patrimonio y tradiciones (HI02 OA 05) */
-      {p:"¿Cuál es el baile nacional de Chile?", o:[["💃","La cueca"],["🩰","El ballet"],["🕺","El breakdance"]], c:0},
-      {p:"¿Qué comida es típica de las Fiestas Patrias?", o:[["🥟","La empanada"],["🍣","El sushi"],["🍕","La pizza"]], c:0},
-      {p:"¿Cuál es un juego típico chileno de septiembre?", o:[["🪁","El volantín"],["♟️","El ajedrez"],["🎳","Los bolos"]], c:0},
-      {p:"El patrimonio natural de Chile son...", o:[["🏞️","Los paisajes, plantas y animales que cuidamos"],["📱","Los celulares nuevos"],["🏬","Los centros comerciales"]], c:0},
-      /* Geografía de Chile (HI02 OA 07 / OA 08 / OA 09) */
-      {p:"¿Cuál es la capital de Chile?", o:[["🏙️","Santiago"],["🏖️","Valparaíso"],["❄️","Punta Arenas"]], c:0},
-      {p:"¿Con qué país limita Chile por el NORTE?", o:[["🇵🇪","Perú"],["🇦🇷","Argentina"],["🇧🇷","Brasil"]], c:0},
-      {p:"¿Con qué país limita Chile por el ESTE, al otro lado de la cordillera?", o:[["🇦🇷","Argentina"],["🇵🇪","Perú"],["🇺🇾","Uruguay"]], c:0},
-      {p:"¿Qué océano está al oeste de Chile?", o:[["🌊","El océano Pacífico"],["🧊","El océano Ártico"],["🏝️","El océano Índico"]], c:0},
-      {p:"Los puntos cardinales son norte, sur, este y...", o:[["🧭","Oeste"],["⬆️","Arriba"],["🌀","Centro"]], c:0},
-      {p:"En el norte de Chile está el desierto más seco del mundo. Se llama...", o:[["🏜️","Desierto de Atacama"],["🐫","Desierto del Sahara"],["🏔️","La Patagonia"]], c:0},
-      {p:"En el sur de Chile hay muchos...", o:[["🌲","Bosques, lagos y lluvia"],["🏜️","Desiertos y arena"],["🌴","Palmeras y playas calientes"]], c:0},
-      {p:"¿Qué es un archipiélago?", o:[["🏝️","Un grupo de islas"],["⛰️","Una montaña muy alta"],["🏜️","Un desierto"]], c:0},
-      {p:"¿Qué es un valle?", o:[["🌄","Un terreno plano entre montañas"],["🌊","Una ola grande"],["🕳️","Un hoyo en la calle"]], c:0},
-      {p:"Un plano de tu casa muestra el lugar visto...", o:[["🗺️","Desde arriba"],["👀","De frente"],["🔍","Muy de cerca"]], c:0},
-      /* Vida en el pasado y el presente (HI02 OAH b / OAH c / OA 15) */
-      {p:"Antes de que existieran los autos, la gente viajaba...", o:[["🐴","En carreta con caballos"],["✈️","En avión"],["🚀","En cohete"]], c:0},
-      {p:"Hace mucho tiempo, para mandar un mensaje lejos se usaba...", o:[["✉️","Una carta"],["📱","Un mensaje de celular"],["📧","Un correo electrónico"]], c:0},
-      {p:"¿Qué servicio nos ayuda a movernos por la ciudad?", o:[["🚌","El transporte público"],["🏥","El hospital"],["🏫","El colegio"]], c:0},
-      /* Formación ciudadana (HI02 OA 12 / OA 13 / OA 16) */
-      {p:"Ser honesta es...", o:[["🤝","Decir la verdad y no hacer trampa"],["🏆","Ganar siempre"],["🤫","Guardar todos los secretos"]], c:0},
-      {p:"Si veo basura tirada en la plaza, lo correcto es...", o:[["🗑️","Echarla al basurero"],["👀","Hacer como que no la vi"],["🦶","Patearla lejos"]], c:0},
-      {p:"Si una compañera nueva está sola en el recreo, lo mejor es...", o:[["🤗","Invitarla a jugar"],["🙈","Dejarla sola"],["😆","Reírse de ella"]], c:0}
-    ]
-  },
-
-  {
-    id:"ingles", nombre:"Inglés", emoji:"🌎",
-    animal:{ e:"🦊", nombre:"Foxy", tipo:"zorrita" },
-    preguntas:[
-      /* Animals */
-      {p:"«CAT» en español es...", o:[["🐱","Gato"],["🐶","Perro"],["🐟","Pez"]], c:0},
-      {p:"«DOG» en español es...", o:[["🐶","Perro"],["🐱","Gato"],["🐰","Conejo"]], c:0},
-      {p:"«BIRD» en español es...", o:[["🐦","Pájaro"],["🐴","Caballo"],["🐷","Chancho"]], c:0},
-      {p:"«HORSE» en español es...", o:[["🐴","Caballo"],["🐮","Vaca"],["🐔","Gallina"]], c:0},
-      {p:"«BUTTERFLY» en español es...", o:[["🦋","Mariposa"],["🐝","Abeja"],["🐞","Chinita"]], c:0},
-      {p:"«UNICORN» en español es...", o:[["🦄","Unicornio"],["🐴","Caballo"],["🐐","Cabra"]], c:0},
-      /* Colours */
-      {p:"«PINK» es el color...", o:[["🩷","Rosado"],["💙","Azul"],["💚","Verde"]], c:0},
-      {p:"«PURPLE» es el color...", o:[["💜","Morado"],["🧡","Naranjo"],["🖤","Negro"]], c:0},
-      {p:"«GREEN» es el color...", o:[["💚","Verde"],["❤️","Rojo"],["💛","Amarillo"]], c:0},
-      {p:"«YELLOW» es el color...", o:[["💛","Amarillo"],["🩷","Rosado"],["🤍","Blanco"]], c:0},
-      /* Numbers */
-      {p:"«SEVEN» es el número...", o:[["7️⃣","Siete"],["6️⃣","Seis"],["9️⃣","Nueve"]], c:0},
-      {p:"«TWELVE» es el número...", o:[["🩷","Doce"],["💜","Dos"],["💙","Veinte"]], c:0},
-      {p:"«TWENTY» es el número...", o:[["🩷","Veinte"],["💜","Doce"],["💙","Dos"]], c:0},
-      /* Family */
-      {p:"«MOTHER» en español es...", o:[["👩","Mamá"],["👨","Papá"],["👶","Bebé"]], c:0},
-      {p:"«SISTER» en español es...", o:[["👧","Hermana"],["👦","Hermano"],["👵","Abuela"]], c:0},
-      {p:"«BROTHER» en español es...", o:[["👦","Hermano"],["👧","Hermana"],["👨","Papá"]], c:0},
-      {p:"«GRANDMOTHER» en español es...", o:[["👵","Abuela"],["👩","Mamá"],["👧","Hermana"]], c:0},
-      /* Body */
-      {p:"«HAND» en español es...", o:[["🖐️","Mano"],["🦶","Pie"],["👁️","Ojo"]], c:0},
-      {p:"«EYES» en español es...", o:[["👀","Ojos"],["👂","Orejas"],["👃","Nariz"]], c:0},
-      {p:"«HEAD» en español es...", o:[["🙂","Cabeza"],["🦵","Pierna"],["🫀","Corazón"]], c:0},
-      /* Greetings */
-      {p:"¿Cómo se dice HOLA en inglés?", o:[["👋","Hello"],["🙏","Please"],["🙈","Sorry"]], c:0},
-      {p:"«GOOD MORNING» significa...", o:[["☀️","Buenos días"],["🌙","Buenas noches"],["👋","Adiós"]], c:0},
-      {p:"«GOOD NIGHT» significa...", o:[["🌙","Buenas noches"],["☀️","Buenos días"],["🍽️","Buen provecho"]], c:0},
-      {p:"«THANK YOU» significa...", o:[["💖","Gracias"],["👋","Hola"],["🙈","Perdón"]], c:0},
-      {p:"«HOW ARE YOU?» significa...", o:[["🙂","¿Cómo estás?"],["📛","¿Cómo te llamas?"],["🕒","¿Qué hora es?"]], c:0},
-      /* Days, food, clothes, school */
-      {p:"«MONDAY» en español es...", o:[["🩷","Lunes"],["💜","Viernes"],["💙","Domingo"]], c:0},
-      {p:"«FRIDAY» en español es...", o:[["🩷","Viernes"],["💜","Lunes"],["💙","Martes"]], c:0},
-      {p:"«APPLE» en español es...", o:[["🍎","Manzana"],["🍌","Plátano"],["🍇","Uva"]], c:0},
-      {p:"«WATER» en español es...", o:[["💧","Agua"],["🥛","Leche"],["🧃","Jugo"]], c:0},
-      {p:"«BOOK» en español es...", o:[["📚","Libro"],["✏️","Lápiz"],["🎒","Mochila"]], c:0}
-    ]
-  }
-];
-
-/* Ánimo cuando se equivoca. Nunca dicen «perdiste» ni «mal». */
-const ANIMOS = [
-  "¡Casi! Prueba otra vez, tú puedes 💗",
-  "Ups, esa no era. ¡Intenta con otra! 🌈",
-  "¡Sigue buscando! Estás cerquita ✨",
-  "No pasa nada, se puede intentar de nuevo 🐶",
-  "¡Buena idea! Pero hay otra mejor. Prueba 🩷",
-  "Equivocarse también es aprender. ¡Otra vez! 🦄"
-];
-
-const FELICES = [
-  "¡Perfecto! 🌟",
-  "¡Lo lograste! 💗",
-  "¡Súper bien! ✨",
-  "¡Eres crack! 🦄",
-  "¡Qué inteligente eres! 🌈",
-  "¡Correcto! Sigue así 🎀",
-  "¡Esa era! 🎉"
-];
-
-/* Pausas: chiste + dato curioso. Humor simple y visual, para 7 años. */
-const PAUSAS = [
-  {ch:"¿Qué le dice un gusanito a otro gusanito? — «Voy a dar una vuelta a la manzana». 🍎🐛", da:"Las mariposas sienten el sabor de las flores… ¡con las patitas! 🦋"},
-  {ch:"¿Qué hace una abeja en el gimnasio? — ¡Zum-ba! 🐝", da:"Un colibrí mueve sus alas tan rápido que casi no se le ven: 80 veces en un segundo. 🐦"},
-  {ch:"¿Qué le dice el número 0 al número 8? — «¡Qué lindo cinturón!» 0️⃣8️⃣", da:"El número más grande con nombre propio se llama googol: un 1 con cien ceros atrás. 🤯"},
-  {ch:"¿Cuál es el último animal del mundo? — El delfín. El-del-fin. 🐬", da:"Los delfines se llaman entre ellos con un silbido distinto para cada uno, como un nombre. 🐬"},
-  {ch:"¿Qué le dijo una pared a la otra pared? — «Nos vemos en la esquina». 🧱", da:"Las nutrias se toman de la manito para dormir y no separarse en el agua. 🦦"},
-  {ch:"¿Qué hace un perro con un taladro? — Taladrando. 🐶🔧", da:"Theo y todos los perros huelen muchísimo mejor que nosotros: pueden oler una galleta escondida en otra pieza. 🍪"},
-  {ch:"¿Por qué los unicornios nunca ganan a las escondidas? — Porque siempre se les ve el cuerno. 🦄", da:"El unicornio es el animal nacional de Escocia… ¡aunque no exista! 🏰"},
-  {ch:"¿Cuál es la fruta más risueña? — La naranja: na-ran-ja-ja-ja. 🍊", da:"Los plátanos son técnicamente unas bayas gigantes, y las frutillas… ¡no son bayas! 🍌"},
-  {ch:"Mamá, mamá, en el colegio me dicen despistada. — Niña, esta es la casa del vecino. 🏠", da:"Un pulpo tiene tres corazones y su sangre es azul. 🐙"},
-  {ch:"¿Qué le dice un semáforo a otro? — «No me mires, que me estoy cambiando». 🚦", da:"En Chile vive el pudú, el ciervo más pequeño del mundo: cabe en una caja de zapatos. 🦌"},
-  {ch:"¿Cómo se llama el campeón japonés de buceo? — Tokofondo. Y el segundo lugar: Kasi Tokofondo. 🤿", da:"El desierto de Atacama, en Chile, es el más seco del mundo: en algunos lugares nunca ha llovido. 🏜️"},
-  {ch:"¿Qué hace un elefante cuando se cae al agua? — Se moja. 🐘💦", da:"Los elefantes se saludan entre ellos enrollando sus trompas, como un abrazo. 🐘"},
-  {ch:"¿Por qué el libro de matemática andaba triste? — Porque tenía muchos problemas. 📚", da:"Si sumas los números del 1 al 100 el resultado es 5.050. ¡Un niño lo descubrió en la escuela! 🔢"},
-  {ch:"¿Qué le dijo la cuchara al azúcar? — «Nos vemos en el café». ☕", da:"Los flamencos son rosados por lo que comen. ¡Nacen grises! 🦩"},
-  {ch:"¿Qué hace la nube cuando le da risa? — Se llueve de la risa. ☁️", da:"Ningún copo de nieve es igual a otro: todos tienen su propio dibujo. ❄️"},
-  {ch:"¿Cuál es el animal más antiguo? — La cebra, porque está en blanco y negro. 🦓", da:"Las rayas de cada cebra son distintas, como nuestras huellas digitales. 🦓"}
-];
-
-/* ============================================================
-   2. GUARDADO (localStorage) — con errores visibles
+   ESTADO Y GUARDADO
    ============================================================ */
 const CLAVE = "refugio_theo_v1";
-let ESTADO = { estrellas:0, animales:[], sonido:true, vistas:{} };
+
+function estadoInicial(){
+  return {
+    nombre:"", estrellas:0, animales:[], objetos:[], sonido:true,
+    progreso:{},                     // por materia: {vistas, pendientes, errores, respondidas}
+    sesion:{ dia:"", misiones:0 }
+  };
+}
+let ESTADO = estadoInicial();
+let puedoGuardar = true;
+let yaAviseGuardado = false;
+
+function progresoDe(id){
+  if(!ESTADO.progreso[id]){
+    ESTADO.progreso[id] = { vistas:[], pendientes:[], errores:{}, respondidas:0 };
+  }
+  const p = ESTADO.progreso[id];
+  if(!Array.isArray(p.vistas)) p.vistas = [];
+  if(!Array.isArray(p.pendientes)) p.pendientes = [];
+  if(!p.errores || typeof p.errores !== "object") p.errores = {};
+  if(typeof p.respondidas !== "number") p.respondidas = 0;
+  return p;
+}
 
 function cargar(){
   try{
@@ -570,10 +409,13 @@ function cargar(){
     if(!crudo) return;
     const d = JSON.parse(crudo);
     if(d && typeof d === "object"){
+      ESTADO.nombre    = typeof d.nombre === "string" ? d.nombre.slice(0,14) : "";
       ESTADO.estrellas = Number(d.estrellas) || 0;
       ESTADO.animales  = Array.isArray(d.animales) ? d.animales : [];
+      ESTADO.objetos   = Array.isArray(d.objetos) ? d.objetos : [];
       ESTADO.sonido    = (d.sonido !== false);
-      ESTADO.vistas    = (d.vistas && typeof d.vistas === "object") ? d.vistas : {};
+      ESTADO.progreso  = (d.progreso && typeof d.progreso === "object") ? d.progreso : {};
+      ESTADO.sesion    = (d.sesion && typeof d.sesion === "object") ? d.sesion : {dia:"", misiones:0};
     }
   }catch(e){
     avisar("No se pudo leer el refugio guardado. Empezamos uno nuevo.", true);
@@ -581,11 +423,17 @@ function cargar(){
 }
 
 function guardar(){
+  if(!puedoGuardar) return false;
   try{
     localStorage.setItem(CLAVE, JSON.stringify(ESTADO));
     return true;
   }catch(e){
-    avisar("No se pudo guardar el progreso en este dispositivo.", true);
+    // Se avisa UNA sola vez, para no llenar la pantalla de alertas rojas.
+    puedoGuardar = false;
+    if(!yaAviseGuardado){
+      yaAviseGuardado = true;
+      avisar("Este navegador no deja guardar el progreso. Se puede jugar igual, pero no quedará guardado.", true);
+    }
     return false;
   }
 }
@@ -598,11 +446,11 @@ function avisar(texto, malo){
   if(malo) el.classList.add("malo");
   el.classList.add("ver");
   clearTimeout(avisoTimer);
-  avisoTimer = setTimeout(function(){ el.classList.remove("ver"); }, 4200);
+  avisoTimer = setTimeout(function(){ el.classList.remove("ver"); }, 5000);
 }
 
 /* ============================================================
-   3. SONIDO — generado con Web Audio (sin archivos, sin voz)
+   SONIDO — Web Audio, sin archivos y sin voz
    ============================================================ */
 let audioCtx = null;
 function tono(frec, inicio, dur, volumen){
@@ -619,7 +467,7 @@ function tono(frec, inicio, dur, volumen){
   osc.stop(audioCtx.currentTime + inicio + dur + 0.05);
 }
 function prepararAudio(){
-  if(audioCtx) return;
+  if(audioCtx){ if(audioCtx.state === "suspended") audioCtx.resume(); return; }
   try{
     const AC = window.AudioContext || window.webkitAudioContext;
     if(AC) audioCtx = new AC();
@@ -636,9 +484,14 @@ function sonMision(){
   const notas = [523,659,784,1047,784,1047,1319];
   for(let i = 0; i < notas.length; i++){ tono(notas[i], i*0.13, .28, .16); }
 }
+function sonCompra(){
+  if(!ESTADO.sonido) return;
+  prepararAudio();
+  tono(880,0,.12,.16); tono(1320,.1,.22,.16);
+}
 
 /* ============================================================
-   4. NAVEGACIÓN
+   UTILIDADES
    ============================================================ */
 function ir(id){
   const todas = document.querySelectorAll(".pantalla");
@@ -646,122 +499,139 @@ function ir(id){
   document.getElementById(id).classList.add("activa");
   window.scrollTo(0,0);
 }
+function barajar(arr){
+  const c = arr.slice();
+  for(let i = c.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = c[i]; c[i] = c[j]; c[j] = t;
+  }
+  return c;
+}
+function alAzar(lista){ return lista[Math.floor(Math.random() * lista.length)]; }
+function materiaPorId(id){
+  for(let i = 0; i < MATERIAS.length; i++){ if(MATERIAS[i].id === id) return MATERIAS[i]; }
+  return null;
+}
+function acento(color, claro){
+  document.documentElement.style.setProperty("--acento", color || "#E13B84");
+  document.documentElement.style.setProperty("--acento-claro", claro || "#FFEAF3");
+}
+function hoy(){
+  const d = new Date();
+  return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+}
 
 /* ============================================================
-   5. MAPA
+   MAPA
    ============================================================ */
 function pintarEstrellas(){
   const t = "⭐ " + ESTADO.estrellas;
   document.getElementById("chip-estrellas").textContent = t;
   document.getElementById("chip-estrellas-2").textContent = t;
+  document.getElementById("chip-estrellas-3").textContent = t;
 }
 
 function pintarMapa(){
+  acento();
   pintarEstrellas();
   const cont = document.getElementById("lista-misiones");
   cont.innerHTML = "";
   MATERIAS.forEach(function(m){
+    const p = progresoDe(m.id);
     const b = document.createElement("button");
     b.className = "btn mision";
+    b.style.borderColor = m.color;
     const ganado = ESTADO.animales.indexOf(m.id) !== -1;
     b.innerHTML = '<span class="emoji">' + m.emoji + '</span>' +
-                  '<span>' + m.nombre + '</span>' +
-                  (ganado ? '<span class="listo">' + m.animal.e + '</span>' : '');
+      '<span>' + m.nombre +
+        '<span class="avance">' + p.respondidas + ' de ' + m.preguntas.length + ' preguntas</span>' +
+      '</span>' +
+      (ganado ? '<span class="listo">' + m.animal.e + '</span>' : '');
     b.addEventListener("click", function(){ iniciarMision(m.id); });
     cont.appendChild(b);
   });
 
   const globo = document.getElementById("globo-mapa");
   const faltan = MATERIAS.length - ESTADO.animales.length;
+  const nombre = ESTADO.nombre ? " " + ESTADO.nombre : "";
   if(ESTADO.animales.length === 0){
-    globo.textContent = "¡Hola! Soy Theo 🐶 Elige una misión y ganemos un amiguito.";
+    globo.textContent = "¡Hola" + nombre + "! Elige una misión y ganemos un amiguito 🐾";
   }else if(faltan === 0){
-    globo.textContent = "¡Tu refugio está completo! Puedes volver a jugar las misiones que quieras 🌈";
+    globo.textContent = "Tu refugio está completo" + nombre + ". Ahora juega para ganar estrellas y comprar cosas 🌈";
   }else{
-    globo.textContent = "¡Vas increíble! Te faltan " + faltan + " amiguito" + (faltan > 1 ? "s" : "") + " para completar el refugio.";
+    globo.textContent = "¡Vas increíble" + nombre + "! Te faltan " + faltan + " amiguito" + (faltan > 1 ? "s" : "") + ".";
   }
 }
 
 /* ============================================================
-   6. MISIÓN — 5 preguntas, sin repetir hasta agotar la materia
+   MISIÓN
    ============================================================ */
-let mision = null; // {materia, preguntas, indice}
+let mision = null;
 
-function barajar(arr){
-  const copia = arr.slice();
-  for(let i = copia.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = copia[i]; copia[i] = copia[j]; copia[j] = tmp;
-  }
-  return copia;
-}
-
-/* Devuelve 5 índices de preguntas priorizando las que aún no ha visto.
-   Cuando ya vio casi todas, reinicia la lista dejando fuera las últimas
-   para que no le salga la misma pregunta dos veces seguidas. */
+/* Elige 5 preguntas: primero las que le costaron y ya descansaron,
+   después las que nunca ha visto. No marca nada todavía: se marca
+   al responder, así salir a la mitad no le quema preguntas. */
 function elegirPreguntas(materia){
+  const p = progresoDe(materia.id);
   const total = materia.preguntas.length;
-  let vistas = Array.isArray(ESTADO.vistas[materia.id]) ? ESTADO.vistas[materia.id] : [];
+  const elegidas = [];
 
-  let disponibles = [];
-  for(let i = 0; i < total; i++){
-    if(vistas.indexOf(i) === -1) disponibles.push(i);
+  const listas = [];
+  for(let i = 0; i < p.pendientes.length; i++){
+    if(p.pendientes[i].espera <= 0) listas.push(p.pendientes[i].i);
   }
+  barajar(listas).slice(0,2).forEach(function(i){ elegidas.push(i); });
 
-  if(disponibles.length < 5){
-    // Se completó la vuelta: se reinicia dejando como "recientes" las últimas vistas.
-    const recientes = vistas.slice(-5);
-    vistas = recientes.slice();
-    disponibles = [];
+  let nuevas = [];
+  for(let i = 0; i < total; i++){
+    if(p.vistas.indexOf(i) === -1 && elegidas.indexOf(i) === -1) nuevas.push(i);
+  }
+  if(nuevas.length < (5 - elegidas.length)){
+    const recientes = p.vistas.slice(-6);
+    p.vistas = recientes.slice();
+    nuevas = [];
     for(let i = 0; i < total; i++){
-      if(recientes.indexOf(i) === -1) disponibles.push(i);
+      if(recientes.indexOf(i) === -1 && elegidas.indexOf(i) === -1) nuevas.push(i);
     }
   }
+  barajar(nuevas).slice(0, 5 - elegidas.length).forEach(function(i){ elegidas.push(i); });
 
-  const elegidas = barajar(disponibles).slice(0,5);
-  ESTADO.vistas[materia.id] = vistas.concat(elegidas);
-  guardar();
-  return elegidas.map(function(i){ return materia.preguntas[i]; });
+  return barajar(elegidas);
 }
 
 function iniciarMision(idMateria){
-  let materia = null;
-  for(let i = 0; i < MATERIAS.length; i++){
-    if(MATERIAS[i].id === idMateria) materia = MATERIAS[i];
-  }
+  const materia = materiaPorId(idMateria);
   if(!materia) return;
-  prepararAudio(); // el primer toque habilita el sonido en el celular
-  mision = { materia: materia, preguntas: elegirPreguntas(materia), indice: 0 };
+  prepararAudio();
+  acento(materia.color, materia.colorClaro);
+  mision = { materia:materia, indices:elegirPreguntas(materia), indice:0, fallo:false };
   document.getElementById("chip-materia").textContent = materia.emoji + " " + materia.nombre;
   ir("p-juego");
   pintarPregunta();
 }
 
-function pintarPuntos(){
-  const cont = document.getElementById("puntos");
-  cont.innerHTML = "";
-  for(let i = 0; i < mision.preguntas.length; i++){
-    const d = document.createElement("div");
-    d.className = "punto";
-    if(i < mision.indice) d.classList.add("hecho");
-    if(i === mision.indice) d.classList.add("ahora");
-    cont.appendChild(d);
+function pintarProgreso(){
+  let huellas = "";
+  for(let i = 0; i < mision.indices.length; i++){
+    huellas += (i <= mision.indice) ? "🐾" : '<span class="off">🐾</span>';
   }
+  document.getElementById("progreso").innerHTML =
+    "Pregunta " + (mision.indice + 1) + " de " + mision.indices.length +
+    '<span class="huellas">' + huellas + '</span>';
 }
 
 function pintarPregunta(){
-  const preg = mision.preguntas[mision.indice];
-  pintarPuntos();
+  const preg = mision.materia.preguntas[mision.indices[mision.indice]];
+  mision.fallo = false;
+  pintarProgreso();
 
   document.getElementById("cara-theo").textContent = "🐶";
   document.getElementById("globo-juego").textContent =
     (mision.indice === 0) ? "¡Vamos con la primera! Tómate tu tiempo 💗"
-                          : "Pregunta " + (mision.indice + 1) + " de " + mision.preguntas.length;
+                          : "Vamos con la siguiente 💗";
 
   const enun = document.getElementById("enunciado");
   enun.innerHTML = "";
-
-  // Si hay un textito para leer, va primero y luego la pregunta
   if(preg.t){
     const cita = document.createElement("span");
     cita.className = "cita";
@@ -779,30 +649,33 @@ function pintarPregunta(){
     enun.appendChild(vis);
   }
 
-  // Las opciones se barajan marcando cuál es la correcta (no por posición)
+  document.getElementById("explicacion").innerHTML = "";
+  document.getElementById("zona-siguiente").innerHTML = "";
+
   const opciones = barajar(preg.o.map(function(op, i){
     return { e:op[0], t:op[1], correcta: i === preg.c };
   }));
+
   const cont = document.getElementById("opciones");
   cont.innerHTML = "";
-  document.getElementById("zona-siguiente").innerHTML = "";
+  let masLarga = 0;
+  opciones.forEach(function(o){ if(o.t.length > masLarga) masLarga = o.t.length; });
+  cont.className = (masLarga <= 12) ? "doble" : "";
 
   opciones.forEach(function(op){
     const b = document.createElement("button");
     b.className = "btn";
     b.innerHTML = '<span class="emoji">' + op.e + '</span><span>' + op.t + '</span>';
-    b.addEventListener("click", function(){ responder(b, op.correcta); });
+    b.addEventListener("click", function(){ responder(b, op.correcta, preg); });
     cont.appendChild(b);
   });
 }
 
-function alAzar(lista){ return lista[Math.floor(Math.random() * lista.length)]; }
-
-function responder(boton, esCorrecta){
+function responder(boton, esCorrecta, preg){
   if(boton.disabled) return;
 
   if(!esCorrecta){
-    // Nunca se penaliza: se apaga esa opción y puede reintentar.
+    mision.fallo = true;
     boton.classList.add("fallida");
     boton.disabled = true;
     document.getElementById("cara-theo").textContent = "🐶";
@@ -810,19 +683,28 @@ function responder(boton, esCorrecta){
     return;
   }
 
-  boton.classList.add("correcta");
   const botones = document.querySelectorAll("#opciones .btn");
   for(let i = 0; i < botones.length; i++){ botones[i].disabled = true; }
+  boton.classList.add("correcta");
 
+  registrarRespuesta(preg);
   ESTADO.estrellas++;
   guardar();
   pintarEstrellas();
   sonAcierto();
   mostrarEstrella();
+
   document.getElementById("cara-theo").textContent = "🥰";
   document.getElementById("globo-juego").textContent = alAzar(FELICES);
 
-  const ultima = (mision.indice === mision.preguntas.length - 1);
+  const exp = document.getElementById("explicacion");
+  exp.innerHTML = "";
+  const caja = document.createElement("div");
+  caja.className = "explica";
+  caja.textContent = preg.x;
+  exp.appendChild(caja);
+
+  const ultima = (mision.indice === mision.indices.length - 1);
   const zona = document.getElementById("zona-siguiente");
   zona.innerHTML = "";
   const b = document.createElement("button");
@@ -833,6 +715,28 @@ function responder(boton, esCorrecta){
     else { mision.indice++; pintarPregunta(); }
   });
   zona.appendChild(b);
+  setTimeout(function(){
+    if(b.scrollIntoView) b.scrollIntoView({block:"center", behavior:"smooth"});
+  }, 150);
+}
+
+/* Marca la pregunta como respondida y, si le costó, la programa para volver. */
+function registrarRespuesta(preg){
+  const p = progresoDe(mision.materia.id);
+  const idx = mision.indices[mision.indice];
+
+  if(p.vistas.indexOf(idx) === -1){
+    p.vistas.push(idx);
+    p.respondidas = p.vistas.length;
+  }
+  p.pendientes = p.pendientes.filter(function(pen){ return pen.i !== idx; });
+  p.pendientes.forEach(function(pen){ pen.espera--; });
+
+  if(mision.fallo){
+    p.errores[preg.k] = (p.errores[preg.k] || 0) + 1;
+    p.pendientes.push({ i:idx, espera:2 });
+    if(p.pendientes.length > 12) p.pendientes.shift();
+  }
 }
 
 function mostrarEstrella(){
@@ -842,58 +746,87 @@ function mostrarEstrella(){
 }
 
 /* ============================================================
-   7. FIN DE MISIÓN + PAUSA
+   FIN DE MISIÓN, PAUSA Y CUIDADO DE LA FATIGA
    ============================================================ */
 function terminarMision(){
   const m = mision.materia;
   const nuevo = ESTADO.animales.indexOf(m.id) === -1;
-  if(nuevo){ ESTADO.animales.push(m.id); }
+  if(nuevo) ESTADO.animales.push(m.id);
+
+  if(ESTADO.sesion.dia !== hoy()) ESTADO.sesion = { dia:hoy(), misiones:0 };
+  ESTADO.sesion.misiones++;
   guardar();
   sonMision();
 
   const zona = document.getElementById("premio-animal");
   if(nuevo){
     zona.innerHTML = '<div style="font-size:88px; line-height:1;">' + m.animal.e + '</div>' +
-      '<div style="font-size:22px; font-weight:bold; color:#FF5C9E;">¡' + m.animal.nombre + ' llegó a tu refugio!</div>' +
-      '<div style="font-size:17px; color:#8A6C7C;">Una ' + m.animal.tipo + ' para ti</div>';
-    document.getElementById("globo-pausa").textContent =
-      "¡Terminaste la misión de " + m.nombre + "! Ganaste un amiguito 🎉";
+      '<div style="font-size:22px; font-weight:bold; color:' + m.color + ';">¡' + m.animal.nombre + ' llegó a tu refugio!</div>' +
+      '<div style="font-size:17px; color:#6E5260;">Una ' + m.animal.tipo + ' para ti</div>';
   }else{
     zona.innerHTML = '<div style="font-size:88px; line-height:1;">' + m.animal.e + '💗</div>' +
-      '<div style="font-size:20px; color:#8A6C7C;">' + m.animal.nombre + ' está feliz de verte otra vez</div>';
-    document.getElementById("globo-pausa").textContent =
-      "¡Otra misión de " + m.nombre + " terminada! Sumaste más estrellas ⭐";
+      '<div style="font-size:19px; color:#6E5260;">' + m.animal.nombre + ' está feliz de verte otra vez</div>';
+  }
+
+  const nombre = ESTADO.nombre ? " " + ESTADO.nombre : "";
+  const globo = document.getElementById("globo-pausa");
+  const btnSeguir = document.getElementById("btn-seguir");
+  if(ESTADO.sesion.misiones >= 3){
+    globo.textContent = "¡Llevamos " + ESTADO.sesion.misiones + " misiones" + nombre +
+      "! Yo ya tengo sueñito 🥱 ¿Seguimos mañana? Tu refugio te espera igual.";
+    btnSeguir.textContent = "Una más ➜";
+  }else{
+    globo.textContent = nuevo
+      ? "¡Terminaste la misión de " + m.nombre + nombre + "! Ganaste un amiguito 🎉"
+      : "¡Otra misión de " + m.nombre + " lista! Sumaste más estrellas ⭐";
+    btnSeguir.textContent = "Seguir jugando ➜";
   }
 
   const pausa = alAzar(PAUSAS);
   document.getElementById("chiste").textContent = pausa.ch;
-  document.getElementById("dato").textContent = pausa.da;
+  document.getElementById("zona-dato").innerHTML = "";
+  const btnDato = document.getElementById("btn-dato");
+  btnDato.style.display = "";
+  btnDato.onclick = function(){
+    const t = document.createElement("div");
+    t.className = "tarjeta";
+    t.innerHTML = '<span class="etiqueta">¿Sabías que...? 💡</span>';
+    const s = document.createElement("span");
+    s.textContent = pausa.da;
+    t.appendChild(s);
+    document.getElementById("zona-dato").appendChild(t);
+    this.style.display = "none";
+  };
 
   pintarEstrellas();
   ir("p-pausa");
 }
 
 /* ============================================================
-   8. REFUGIO
+   REFUGIO Y TIENDA
    ============================================================ */
 function pintarRefugio(){
+  acento();
   pintarEstrellas();
+
+  const deco = document.getElementById("decoracion");
+  if(ESTADO.objetos.length === 0){
+    deco.innerHTML = '<span class="nada">Tu refugio está pelado. Con tus estrellas puedes comprarle cosas en la tienda 🛍️</span>';
+  }else{
+    let txt = "";
+    OBJETOS.forEach(function(o){ if(ESTADO.objetos.indexOf(o.id) !== -1) txt += o.e + " "; });
+    deco.textContent = txt;
+  }
+
   const grid = document.getElementById("grid-refugio");
   grid.innerHTML = "";
   MATERIAS.forEach(function(m){
     const tiene = ESTADO.animales.indexOf(m.id) !== -1;
     const d = document.createElement("div");
-    d.className = "jaula";
-    if(!tiene) d.classList.add("vacia");
-    if(tiene){
-      d.innerHTML = '<div class="bicho">' + m.animal.e + '</div>' +
-                    '<div class="nombre">' + m.animal.nombre + '</div>' +
-                    '<div class="de">' + m.nombre + '</div>';
-    }else{
-      d.innerHTML = '<div class="bicho">' + m.animal.e + '</div>' +
-                    '<div class="nombre">¿Quién será?</div>' +
-                    '<div class="de">Juega ' + m.nombre + '</div>';
-    }
+    d.className = "jaula" + (tiene ? "" : " vacia");
+    d.innerHTML = '<div class="bicho">' + m.animal.e + '</div>' +
+      '<div class="nombre">' + (tiene ? m.animal.nombre : "¿Quién será?") + '</div>' +
+      '<div class="de">' + (tiene ? m.nombre : "Juega " + m.nombre) + '</div>';
     grid.appendChild(d);
   });
 
@@ -902,27 +835,71 @@ function pintarRefugio(){
   if(ESTADO.animales.length === 0){
     globo.textContent = "Tu refugio está esperando. ¡Juega una misión y llega el primero! 🐾";
   }else if(faltan === 0){
-    globo.textContent = "¡Están todos! Cuidaste muy bien de tu refugio 🌈🏡";
+    globo.textContent = "¡Están todos! Ahora puedes decorar el refugio con tus estrellas 🌈";
   }else{
     globo.textContent = "Tienes " + ESTADO.animales.length + " amiguito" +
       (ESTADO.animales.length > 1 ? "s" : "") + ". Faltan " + faltan + " por llegar 🐾";
   }
 }
 
+function pintarTienda(){
+  acento();
+  pintarEstrellas();
+  const grid = document.getElementById("grid-tienda");
+  grid.innerHTML = "";
+  OBJETOS.forEach(function(o){
+    const tengo = ESTADO.objetos.indexOf(o.id) !== -1;
+    const puedo = ESTADO.estrellas >= o.precio;
+    const b = document.createElement("button");
+    b.className = "cosa" + (tengo ? " tengo" : (puedo ? "" : " lejos"));
+    b.innerHTML = '<span class="e">' + o.e + '</span>' + o.nombre +
+      '<span class="precio">' + (tengo ? "¡Ya es tuyo! 💚" : "⭐ " + o.precio) + '</span>';
+    if(tengo){ b.disabled = true; }
+    else { b.addEventListener("click", function(){ comprar(o); }); }
+    grid.appendChild(b);
+  });
+  document.getElementById("globo-tienda").textContent =
+    "Tienes " + ESTADO.estrellas + " estrellas. Cada respuesta correcta te da una ⭐";
+}
+
+function comprar(o){
+  if(ESTADO.objetos.indexOf(o.id) !== -1) return;
+  if(ESTADO.estrellas < o.precio){
+    document.getElementById("globo-tienda").textContent =
+      "Te faltan " + (o.precio - ESTADO.estrellas) + " estrellas para eso. ¡Juega otra misión y vuelve! 💪";
+    return;
+  }
+  ESTADO.estrellas -= o.precio;
+  ESTADO.objetos.push(o.id);
+  guardar();
+  sonCompra();
+  pintarTienda();
+  document.getElementById("globo-tienda").textContent = "¡" + o.nombre + " " + o.e + " ya está en tu refugio!";
+}
+
 /* ============================================================
-   9. PANEL ADULTOS
+   PANEL DE ADULTOS
    ============================================================ */
+function pintarReporte(){
+  let filas = "";
+  MATERIAS.forEach(function(m){
+    const p = progresoDe(m.id);
+    const temas = Object.keys(p.errores).sort(function(a,b){ return p.errores[b] - p.errores[a]; }).slice(0,3);
+    filas += "<tr><td><strong>" + m.nombre + "</strong><br><span style='color:#6E5260'>" +
+      (temas.length ? "Le costó: " + temas.join(", ") : "Sin temas difíciles por ahora") +
+      "</span></td><td class='n'>" + p.respondidas + " / " + m.preguntas.length + "</td></tr>";
+  });
+  document.getElementById("reporte").innerHTML =
+    '<table class="reporte"><tr><th>Asignatura</th><th class="n">Respondidas</th></tr>' + filas + '</table>';
+}
+
 function exportar(){
   try{
-    const datos = JSON.stringify(ESTADO, null, 2);
-    const blob = new Blob([datos], {type:"application/json"});
+    const blob = new Blob([JSON.stringify(ESTADO, null, 2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "refugio-de-theo-respaldo.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = "refugio-de-theo-respaldo.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
     avisar("Respaldo descargado. Guárdalo en un lugar seguro.");
   }catch(e){
@@ -940,15 +917,16 @@ function importar(archivo){
         return;
       }
       if(!confirm("Esto reemplaza el refugio actual por el del respaldo. ¿Continuar?")) return;
+      ESTADO.nombre    = typeof d.nombre === "string" ? d.nombre.slice(0,14) : "";
       ESTADO.estrellas = Number(d.estrellas) || 0;
-      ESTADO.animales  = d.animales.filter(function(id){
-        return MATERIAS.some(function(m){ return m.id === id; });
-      });
-      ESTADO.sonido = (d.sonido !== false);
-      ESTADO.vistas = (d.vistas && typeof d.vistas === "object") ? d.vistas : {};
+      ESTADO.animales  = d.animales.filter(function(id){ return !!materiaPorId(id); });
+      ESTADO.objetos   = Array.isArray(d.objetos) ? d.objetos : [];
+      ESTADO.sonido    = (d.sonido !== false);
+      ESTADO.progreso  = (d.progreso && typeof d.progreso === "object") ? d.progreso : {};
+      ESTADO.sesion    = (d.sesion && typeof d.sesion === "object") ? d.sesion : {dia:"", misiones:0};
       if(guardar()){
         avisar("Refugio recuperado 💗");
-        pintarMapa(); pintarRefugio(); pintarBotonSonido();
+        pintarMapa(); pintarRefugio(); pintarReporte(); pintarBotonSonido(); pintarSaludo();
       }
     }catch(e){
       avisar("No se pudo leer el archivo. ¿Es el respaldo correcto?", true);
@@ -959,25 +937,62 @@ function importar(archivo){
 }
 
 function reiniciar(){
-  if(!confirm("Se borran las estrellas y todos los animalitos del refugio. Esto no se puede deshacer. ¿Seguro?")) return;
-  ESTADO = { estrellas:0, animales:[], sonido:ESTADO.sonido, vistas:{} };
-  if(guardar()){
-    avisar("Listo, el refugio quedó vacío para empezar de nuevo.");
-    pintarMapa(); pintarRefugio();
-  }
+  if(!confirm("Se borran el nombre, las estrellas, los animalitos y el avance. Esto no se puede deshacer. ¿Seguro?")) return;
+  const sonido = ESTADO.sonido;
+  ESTADO = estadoInicial();
+  ESTADO.sonido = sonido;
+  guardar();
+  avisar("Listo, quedó todo como nuevo.");
+  pintarMapa(); pintarRefugio(); pintarReporte(); pintarSaludo();
+  ir("p-hola");
 }
 
 /* ============================================================
-   10. ARRANQUE
+   ARRANQUE
    ============================================================ */
 function pintarBotonSonido(){
-  document.getElementById("btn-sonido").textContent = ESTADO.sonido ? "🔊" : "🔇";
+  const t = ESTADO.sonido ? "🔊" : "🔇";
+  document.getElementById("btn-sonido").textContent = t;
+  document.getElementById("btn-sonido-juego").textContent = t;
 }
+function pintarSaludo(){
+  document.getElementById("saludo-inicio").textContent = ESTADO.nombre
+    ? "¡Qué bueno verte, " + ESTADO.nombre + "! 🐾"
+    : "Juega, aprende y llena tu refugio de amiguitos";
+}
+function alternarSonido(){
+  ESTADO.sonido = !ESTADO.sonido;
+  guardar();
+  pintarBotonSonido();
+  if(ESTADO.sonido){ prepararAudio(); sonAcierto(); }
+}
+
+let habiaGuardado = false;
+try{ habiaGuardado = !!localStorage.getItem(CLAVE); }catch(e){ habiaGuardado = false; }
 
 cargar();
 pintarBotonSonido();
+pintarSaludo();
 pintarMapa();
 pintarRefugio();
+pintarReporte();
+ir(habiaGuardado ? "p-inicio" : "p-hola");
+
+document.getElementById("btn-guardar-nombre").addEventListener("click", function(){
+  ESTADO.nombre = document.getElementById("campo-nombre").value.trim().slice(0,14);
+  guardar();
+  pintarSaludo(); pintarMapa();
+  ir("p-inicio");
+});
+document.getElementById("btn-sin-nombre").addEventListener("click", function(){
+  ESTADO.nombre = "";
+  guardar();
+  pintarSaludo();
+  ir("p-inicio");
+});
+document.getElementById("campo-nombre").addEventListener("keydown", function(ev){
+  if(ev.key === "Enter") document.getElementById("btn-guardar-nombre").click();
+});
 
 const botonesIr = document.querySelectorAll("[data-ir]");
 for(let i = 0; i < botonesIr.length; i++){
@@ -985,38 +1000,36 @@ for(let i = 0; i < botonesIr.length; i++){
     const destino = this.getAttribute("data-ir");
     if(destino === "p-mapa") pintarMapa();
     if(destino === "p-refugio") pintarRefugio();
+    if(destino === "p-inicio") acento();
     ir(destino);
   });
 }
 
 document.getElementById("btn-jugar").addEventListener("click", function(){
-  prepararAudio();
-  pintarMapa();
-  ir("p-mapa");
+  prepararAudio(); pintarMapa(); ir("p-mapa");
 });
 document.getElementById("btn-ver-refugio").addEventListener("click", function(){
-  pintarRefugio();
-  ir("p-refugio");
+  pintarRefugio(); ir("p-refugio");
+});
+document.getElementById("btn-tienda").addEventListener("click", function(){
+  pintarTienda(); ir("p-tienda");
 });
 document.getElementById("btn-salir-mision").addEventListener("click", function(){
-  pintarMapa();
-  ir("p-mapa");
+  if(confirm("¿Quieres dejar esta misión? Las estrellas que ya ganaste se quedan contigo.")){
+    pintarMapa(); ir("p-mapa");
+  }
 });
 document.getElementById("btn-seguir").addEventListener("click", function(){
-  pintarMapa();
-  ir("p-mapa");
+  pintarMapa(); ir("p-mapa");
 });
 document.getElementById("btn-a-refugio").addEventListener("click", function(){
-  pintarRefugio();
-  ir("p-refugio");
+  pintarRefugio(); ir("p-refugio");
 });
-document.getElementById("btn-sonido").addEventListener("click", function(){
-  ESTADO.sonido = !ESTADO.sonido;
-  guardar();
-  pintarBotonSonido();
-  if(ESTADO.sonido){ prepararAudio(); sonAcierto(); }
+document.getElementById("btn-sonido").addEventListener("click", alternarSonido);
+document.getElementById("btn-sonido-juego").addEventListener("click", alternarSonido);
+document.getElementById("btn-adultos").addEventListener("click", function(){
+  acento(); pintarReporte(); ir("p-adultos");
 });
-document.getElementById("btn-adultos").addEventListener("click", function(){ ir("p-adultos"); });
 document.getElementById("btn-exportar").addEventListener("click", exportar);
 document.getElementById("btn-importar").addEventListener("click", function(){
   document.getElementById("archivo-importar").click();
@@ -1026,6 +1039,15 @@ document.getElementById("archivo-importar").addEventListener("change", function(
   this.value = "";
 });
 document.getElementById("btn-reiniciar").addEventListener("click", reiniciar);
+
+/* Service worker: deja el juego guardado en el dispositivo para poder jugar
+   sin internet. Si se abre el archivo directamente (file://), no se registra
+   y el juego funciona igual. */
+if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
