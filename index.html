@@ -139,9 +139,10 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
   display:block; font-size:20px; color:var(--texto); line-height:1.5;
   background:var(--acento-claro); border-radius:16px; padding:12px 14px; text-align:left;
 }
-.explica{
-  background:#DCF5E9; border:3px solid var(--menta); border-radius:22px;
-  padding:14px 16px; font-size:19px; line-height:1.4; margin-bottom:14px;
+.porque{font-size:17px; color:var(--texto-suave); line-height:1.35; margin-top:7px;}
+.dorada{
+  background:#FFF3D1; border:3px solid #E8A400; border-radius:20px;
+  padding:9px 14px; font-size:17px; text-align:center; margin-bottom:12px; color:#7A5600;
 }
 
 .premio{position:fixed; inset:0; display:none; align-items:center; justify-content:center; pointer-events:none; z-index:50;}
@@ -159,7 +160,24 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 }
 .decoracion .nada{font-size:16px; color:var(--texto-suave);}
 .refugio{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
-.jaula{background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px; padding:14px 10px; text-align:center;}
+.jaula{
+  background:var(--crema); border:4px solid var(--rosa-suave); border-radius:26px;
+  padding:14px 10px 12px; text-align:center; font-family:var(--fuente); color:var(--texto);
+}
+.jaula.viva{cursor:pointer;}
+.jaula.viva .bicho{animation:flota 3.2s ease-in-out infinite;}
+.jaula.viva:nth-child(2) .bicho{animation-delay:.5s;}
+.jaula.viva:nth-child(3) .bicho{animation-delay:1s;}
+.jaula.viva:nth-child(4) .bicho{animation-delay:1.6s;}
+.jaula.viva:nth-child(5) .bicho{animation-delay:2.1s;}
+@keyframes flota{0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-7px) rotate(3deg);}}
+.jaula .bicho.salta{animation:saltito .6s ease;}
+@keyframes saltito{0%,100%{transform:translateY(0) scale(1);} 35%{transform:translateY(-18px) scale(1.15);} 70%{transform:translateY(0) scale(.95);}}
+.jaula .renombrar{
+  background:none; border:0; font-family:var(--fuente); font-size:13px;
+  color:var(--texto-suave); text-decoration:underline; cursor:pointer; padding:6px;
+}
+.decoracion span.cosa-deco{display:inline-block; animation:flota 4s ease-in-out infinite;}
 .jaula .bicho{font-size:52px; line-height:1.1;}
 .jaula .nombre{font-size:18px; font-weight:bold; margin-top:4px;}
 .jaula .de{font-size:14px; color:var(--texto-suave);}
@@ -192,11 +210,12 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
   padding:13px 14px; font-family:var(--fuente); font-size:17px; color:var(--texto);
   width:100%; margin-bottom:10px; cursor:pointer; text-align:center;
 }
-.enlace-adultos{
-  background:none; border:0; padding:12px; margin-top:2px;
-  font-family:var(--fuente); font-size:14px; color:var(--texto-suave);
-  text-decoration:underline; cursor:pointer;
+.huellita{
+  position:fixed; right:10px; bottom:8px; z-index:5;
+  background:none; border:0; padding:10px; font-size:18px;
+  opacity:.28; cursor:pointer; transition:transform .9s ease, opacity .9s ease;
 }
+.huellita.apretando{transform:scale(1.6); opacity:.8;}
 .reporte{width:100%; border-collapse:collapse; font-size:15px; background:var(--crema); border-radius:18px; overflow:hidden;}.reporte th,.reporte td{padding:9px 10px; text-align:left; border-bottom:1px solid #F0DDE6;}
 .reporte th{background:#F7E7EF; font-size:14px;}
 .reporte td.n{text-align:right; white-space:nowrap;}
@@ -249,9 +268,8 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       <button class="btn principal" id="btn-jugar">¡Jugar! ✨</button>
       <button class="btn suave" id="btn-ver-refugio">Mi refugio 🏡</button>
     </div>
-    <div class="pie">Hecho con cariño para ti 💗<br>
-      <button class="enlace-adultos" id="btn-adultos">Para adultos</button>
-    </div>
+    <div class="pie">Hecho con cariño para ti 💗</div>
+    <button class="huellita" id="btn-adultos" aria-label="Panel para adultos: mantener apretado">🐾</button>
   </section>
 
   <!-- ============ MAPA ============ -->
@@ -281,8 +299,8 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       <div class="cara" id="cara-theo">🐶</div>
       <div class="globo" id="globo-juego" aria-live="polite">¡Vamos!</div>
     </div>
+    <div id="aviso-dorada"></div>
     <div class="enunciado" id="enunciado"></div>
-    <div id="explicacion"></div>
     <div id="opciones"></div>
     <div id="zona-siguiente"></div>
   </section>
@@ -391,6 +409,8 @@ const CLAVE = "refugio_theo_v1";
 function estadoInicial(){
   return {
     nombre:"", estrellas:0, animales:[], objetos:[], sonido:true,
+    apodos:{},                       // los nombres que ella les pone a sus animales
+    racha:{ dias:0, ultimo:"" },
     progreso:{},                     // por materia: {vistas, pendientes, errores, respondidas}
     sesion:{ dia:"", misiones:0 }
   };
@@ -426,6 +446,8 @@ function cargar(){
       ESTADO.sonido    = (d.sonido !== false);
       ESTADO.progreso  = (d.progreso && typeof d.progreso === "object") ? d.progreso : {};
       ESTADO.sesion    = (d.sesion && typeof d.sesion === "object") ? d.sesion : {dia:"", misiones:0};
+      ESTADO.apodos    = (d.apodos && typeof d.apodos === "object") ? d.apodos : {};
+      ESTADO.racha     = (d.racha && typeof d.racha === "object") ? d.racha : {dias:0, ultimo:""};
     }
   }catch(e){
     avisar("No se pudo leer el refugio guardado. Empezamos uno nuevo.", true);
@@ -518,6 +540,7 @@ function barajar(arr){
   return c;
 }
 function alAzar(lista){ return lista[Math.floor(Math.random() * lista.length)]; }
+function azarEntero(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 function materiaPorId(id){
   for(let i = 0; i < MATERIAS.length; i++){ if(MATERIAS[i].id === id) return MATERIAS[i]; }
   return null;
@@ -530,6 +553,25 @@ function hoy(){
   const d = new Date();
   return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
 }
+function ayer(){
+  const d = new Date(Date.now() - 86400000);
+  return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+}
+
+/* Cuenta los días seguidos que ha jugado. Si se salta un día vuelve a 1:
+   nunca se muestra como castigo, solo como algo que se puede volver a subir. */
+function marcarRacha(){
+  const r = ESTADO.racha;
+  if(r.ultimo === hoy()) return 0;
+  r.dias = (r.ultimo === ayer()) ? r.dias + 1 : 1;
+  r.ultimo = hoy();
+  if(r.dias === 3 || r.dias === 7 || r.dias === 14 || r.dias === 30){
+    ESTADO.estrellas += 10;
+    return r.dias;
+  }
+  return 0;
+}
+function nombreAnimal(m){ return ESTADO.apodos[m.id] || m.animal.nombre; }
 
 /* ============================================================
    MAPA
@@ -553,13 +595,20 @@ function pintarMapa(){
     b.style.borderColor = m.color;
     const ganado = ESTADO.animales.indexOf(m.id) !== -1;
     b.innerHTML = '<span class="emoji">' + m.emoji + '</span>' +
-      '<span>' + m.nombre +
-        '<span class="avance">' + (m.generado ? 'preguntas nuevas siempre' : p.respondidas + ' de ' + m.preguntas.length + ' preguntas') + '</span>' +
-      '</span>' +
+      '<span>' + m.nombre + '</span>' +
       (ganado ? '<span class="listo">' + m.animal.e + '</span>' : '');
     b.addEventListener("click", function(){ iniciarMision(m.id); });
     cont.appendChild(b);
   });
+
+  if(ESTADO.animales.length === MATERIAS.length){
+    const bm = document.createElement("button");
+    bm.className = "btn mision";
+    bm.style.borderColor = "#E13B84";
+    bm.innerHTML = '<span class="emoji">🌈</span><span>Misión mezclada</span>';
+    bm.addEventListener("click", iniciarMezcla);
+    cont.appendChild(bm);
+  }
 
   const globo = document.getElementById("globo-mapa");
   const faltan = MATERIAS.length - ESTADO.animales.length;
@@ -567,7 +616,7 @@ function pintarMapa(){
   if(ESTADO.animales.length === 0){
     globo.textContent = "¡Hola" + nombre + "! Elige una misión y ganemos un amiguito 🐾";
   }else if(faltan === 0){
-    globo.textContent = "Tu refugio está completo" + nombre + ". Ahora juega para ganar estrellas y comprar cosas 🌈";
+    globo.textContent = "Tu refugio está completo" + nombre + ". Prueba la Misión mezclada 🌈";
   }else{
     globo.textContent = "¡Vas increíble" + nombre + "! Te faltan " + faltan + " amiguito" + (faltan > 1 ? "s" : "") + ".";
   }
@@ -624,8 +673,35 @@ function iniciarMision(idMateria){
     generarMatematica(3, pr.temasFlojos, pr.genRecientes).forEach(function(q){ items.push({ preg:q, idx:null }); });
     items = barajar(items);
   }
+  items.forEach(function(it){ it.materia = materia; });
+  if(Math.random() < 0.3 && items.length) items[azarEntero(0, items.length - 1)].dorada = true;
   mision = { materia:materia, items:items, indice:0, fallo:false };
   document.getElementById("chip-materia").textContent = materia.emoji + " " + materia.nombre;
+  ir("p-juego");
+  pintarPregunta();
+}
+
+/* Se desbloquea al completar el refugio: una pregunta de cada materia */
+function iniciarMezcla(){
+  prepararAudio();
+  acento("#E13B84", "#FFEAF3");
+  const items = [];
+  MATERIAS.forEach(function(m){
+    if(m.generado && typeof generarMatematica === "function"){
+      const p = progresoDe(m.id);
+      const q = generarMatematica(1, p.temasFlojos, p.genRecientes)[0];
+      if(q) items.push({ preg:q, idx:null, materia:m });
+    }else{
+      const idxs = elegirPreguntas(m);
+      items.push({ preg:m.preguntas[idxs[0]], idx:idxs[0], materia:m });
+    }
+  });
+  const mezcla = { id:"mezcla", nombre:"Misión mezclada", emoji:"🌈", color:"#E13B84",
+                   animal:{ e:"🌈", nombre:"Arcoíris", tipo:"sorpresa" }, preguntas:[] };
+  const lista = barajar(items);
+  if(Math.random() < 0.4 && lista.length) lista[azarEntero(0, lista.length - 1)].dorada = true;
+  mision = { materia:mezcla, items:lista, indice:0, fallo:false };
+  document.getElementById("chip-materia").textContent = "🌈 Mezclada";
   ir("p-juego");
   pintarPregunta();
 }
@@ -635,13 +711,20 @@ function pintarProgreso(){
   for(let i = 0; i < mision.items.length; i++){
     huellas += (i <= mision.indice) ? "🐾" : '<span class="off">🐾</span>';
   }
-  document.getElementById("progreso").innerHTML =
-    "Pregunta " + (mision.indice + 1) + " de " + mision.items.length +
-    '<span class="huellas">' + huellas + '</span>';
+  document.getElementById("progreso").innerHTML = '<span class="huellas">' + huellas + '</span>';
 }
 
 function pintarPregunta(){
-  const preg = mision.items[mision.indice].preg;
+  const item = mision.items[mision.indice];
+  const preg = item.preg;
+  const dor = document.getElementById("aviso-dorada");
+  dor.innerHTML = "";
+  if(item.dorada){
+    const d = document.createElement("div");
+    d.className = "dorada";
+    d.textContent = "⭐ ¡Pregunta dorada! Esta vale 3 estrellas";
+    dor.appendChild(d);
+  }
   mision.fallo = false;
   pintarProgreso();
 
@@ -669,7 +752,6 @@ function pintarPregunta(){
     enun.appendChild(vis);
   }
 
-  document.getElementById("explicacion").innerHTML = "";
   document.getElementById("zona-siguiente").innerHTML = "";
 
   const opciones = barajar(preg.o.map(function(op, i){
@@ -713,22 +795,26 @@ function responder(boton, esCorrecta, preg){
   for(let i = 0; i < botones.length; i++){ botones[i].disabled = true; }
   boton.classList.add("correcta");
 
+  const item = mision.items[mision.indice];
   registrarRespuesta(preg);
-  ESTADO.estrellas++;
+  ESTADO.estrellas += item.dorada ? 3 : 1;
   guardar();
   pintarEstrellas();
   sonAcierto();
   mostrarEstrella();
 
   document.getElementById("cara-theo").textContent = "🥰";
-  document.getElementById("globo-juego").textContent = alAzar(FELICES);
+  // Theo felicita y explica en el mismo globo, no en un cartel aparte
+  const globo = document.getElementById("globo-juego");
+  globo.innerHTML = "";
+  const feliz = document.createElement("div");
+  feliz.textContent = alAzar(FELICES) + (item.dorada ? " ¡Y era dorada! +3 ⭐" : "");
+  const porque = document.createElement("div");
+  porque.className = "porque";
+  porque.textContent = preg.x;
+  globo.appendChild(feliz);
+  globo.appendChild(porque);
 
-  const exp = document.getElementById("explicacion");
-  exp.innerHTML = "";
-  const caja = document.createElement("div");
-  caja.className = "explica";
-  caja.textContent = preg.x;
-  exp.appendChild(caja);
 
   const ultima = (mision.indice === mision.items.length - 1);
   const zona = document.getElementById("zona-siguiente");
@@ -748,7 +834,8 @@ function responder(boton, esCorrecta, preg){
 
 /* Marca la pregunta como respondida y, si le costó, la programa para volver. */
 function registrarRespuesta(preg){
-  const p = progresoDe(mision.materia.id);
+  const suMateria = mision.items[mision.indice].materia || mision.materia;
+  const p = progresoDe(suMateria.id);
   const idx = mision.items[mision.indice].idx;
 
   if(mision.fallo) p.errores[preg.k] = (p.errores[preg.k] || 0) + 1;
@@ -780,6 +867,8 @@ function registrarRespuesta(preg){
 
 function mostrarEstrella(){
   const p = document.getElementById("premio");
+  const it = mision && mision.items[mision.indice];
+  p.firstChild.textContent = (it && it.dorada) ? "🌟" : "⭐";
   p.classList.add("ver");
   setTimeout(function(){ p.classList.remove("ver"); }, 900);
 }
@@ -789,28 +878,43 @@ function mostrarEstrella(){
    ============================================================ */
 function terminarMision(){
   const m = mision.materia;
-  const nuevo = ESTADO.animales.indexOf(m.id) === -1;
+  const nuevo = (m.id !== "mezcla") && (ESTADO.animales.indexOf(m.id) === -1);
   if(nuevo) ESTADO.animales.push(m.id);
 
   if(ESTADO.sesion.dia !== hoy()) ESTADO.sesion = { dia:hoy(), misiones:0 };
   ESTADO.sesion.misiones++;
+  const premioRacha = marcarRacha();
   guardar();
   sonMision();
 
   const zona = document.getElementById("premio-animal");
-  if(nuevo){
+  if(m.id === "mezcla"){
+    zona.innerHTML = '<div style="font-size:82px; line-height:1;">🌈</div>' +
+      '<div style="font-size:20px; color:#6E5260;">¡Misión mezclada terminada!</div>';
+  }else if(nuevo){
     zona.innerHTML = '<div style="font-size:88px; line-height:1;">' + m.animal.e + '</div>' +
-      '<div style="font-size:22px; font-weight:bold; color:' + m.color + ';">¡' + m.animal.nombre + ' llegó a tu refugio!</div>' +
+      '<div style="font-size:22px; font-weight:bold; color:' + m.color + ';">¡' + nombreAnimal(m) + ' llegó a tu refugio!</div>' +
       '<div style="font-size:17px; color:#6E5260;">Una ' + m.animal.tipo + ' para ti</div>';
   }else{
     zona.innerHTML = '<div style="font-size:88px; line-height:1;">' + m.animal.e + '💗</div>' +
-      '<div style="font-size:19px; color:#6E5260;">' + m.animal.nombre + ' está feliz de verte otra vez</div>';
+      '<div style="font-size:19px; color:#6E5260;">' + nombreAnimal(m) + ' está feliz de verte otra vez</div>';
   }
 
   const nombre = ESTADO.nombre ? " " + ESTADO.nombre : "";
   const globo = document.getElementById("globo-pausa");
   const btnSeguir = document.getElementById("btn-seguir");
-  if(ESTADO.sesion.misiones >= 3){
+  const completo = (ESTADO.animales.length === MATERIAS.length);
+  if(nuevo && completo && m.id !== "mezcla"){
+    // el momento grande: llegó el último animalito
+    zona.innerHTML = '<div style="font-size:64px; line-height:1.2;">🦄 🐰 🐢 🦙 🦊</div>' +
+      '<div style="font-size:23px; font-weight:bold; color:#E13B84;">¡Tu refugio está completo!</div>' +
+      '<div style="font-size:17px; color:#6E5260;">Ya viven aquí los cinco amiguitos</div>';
+    globo.textContent = "¡Lo lograste" + nombre + "! Ahora puedes jugar la Misión mezclada 🌈 y comprarles cosas en la tienda.";
+    btnSeguir.textContent = "Seguir jugando ➜";
+  }else if(premioRacha){
+    globo.textContent = "¡" + premioRacha + " días seguidos jugando" + nombre + "! Te regalo 10 estrellas 🎉";
+    btnSeguir.textContent = "Seguir jugando ➜";
+  }else if(ESTADO.sesion.misiones >= 3){
     globo.textContent = "¡Llevamos " + ESTADO.sesion.misiones + " misiones" + nombre +
       "! Yo ya tengo sueñito 🥱 ¿Seguimos mañana? Tu refugio te espera igual.";
     btnSeguir.textContent = "Una más ➜";
@@ -853,8 +957,12 @@ function pintarRefugio(){
     deco.innerHTML = '<span class="nada">Tu refugio está pelado. Con tus estrellas puedes comprarle cosas en la tienda 🛍️</span>';
   }else{
     let txt = "";
-    OBJETOS.forEach(function(o){ if(ESTADO.objetos.indexOf(o.id) !== -1) txt += o.e + " "; });
-    deco.textContent = txt;
+    OBJETOS.forEach(function(o, i){
+      if(ESTADO.objetos.indexOf(o.id) !== -1){
+        txt += '<span class="cosa-deco" style="animation-delay:' + (i * 0.35) + 's">' + o.e + '</span> ';
+      }
+    });
+    deco.innerHTML = txt;
   }
 
   const grid = document.getElementById("grid-refugio");
@@ -862,10 +970,22 @@ function pintarRefugio(){
   MATERIAS.forEach(function(m){
     const tiene = ESTADO.animales.indexOf(m.id) !== -1;
     const d = document.createElement("div");
-    d.className = "jaula" + (tiene ? "" : " vacia");
+    d.className = "jaula" + (tiene ? " viva" : " vacia");
     d.innerHTML = '<div class="bicho">' + m.animal.e + '</div>' +
-      '<div class="nombre">' + (tiene ? m.animal.nombre : "¿Quién será?") + '</div>' +
+      '<div class="nombre">' + (tiene ? nombreAnimal(m) : "¿Quién será?") + '</div>' +
       '<div class="de">' + (tiene ? m.nombre : "Juega " + m.nombre) + '</div>';
+    if(tiene){
+      // tocarlo lo hace saltar y decir algo
+      d.addEventListener("click", function(ev){
+        if(ev.target && ev.target.className === "renombrar") return;
+        saludarAnimal(m, d.querySelector(".bicho"));
+      });
+      const r = document.createElement("button");
+      r.className = "renombrar";
+      r.textContent = "✏️ ponerle nombre";
+      r.addEventListener("click", function(ev){ ev.stopPropagation(); renombrar(m); });
+      d.appendChild(r);
+    }
     grid.appendChild(d);
   });
 
@@ -879,6 +999,40 @@ function pintarRefugio(){
     globo.textContent = "Tienes " + ESTADO.animales.length + " amiguito" +
       (ESTADO.animales.length > 1 ? "s" : "") + ". Faltan " + faltan + " por llegar 🐾";
   }
+}
+
+/* Tocar un animalito: salta, suena bajito y dice algo */
+const FRASES_ANIMAL = [
+  "está feliz de verte 💗",
+  "quiere jugar contigo 🐾",
+  "te manda un saludo ✨",
+  "dice que eres muy inteligente 🌟",
+  "estaba esperándote 🥰",
+  "te quiere mucho 💕"
+];
+function saludarAnimal(m, elemento){
+  if(elemento){
+    elemento.classList.remove("salta");
+    void elemento.offsetWidth;
+    elemento.classList.add("salta");
+  }
+  if(ESTADO.sonido){ prepararAudio(); tono(760, 0, .12, .12); tono(1010, .09, .16, .12); }
+  document.getElementById("globo-refugio").textContent =
+    nombreAnimal(m) + " " + alAzar(FRASES_ANIMAL);
+}
+
+/* Ella le puede poner el nombre que quiera a cada animalito */
+function renombrar(m){
+  const actual = nombreAnimal(m);
+  const nuevo = prompt("¿Cómo quieres que se llame?", actual);
+  if(nuevo === null) return;
+  const limpio = nuevo.trim().slice(0, 12);
+  if(!limpio){ delete ESTADO.apodos[m.id]; }
+  else { ESTADO.apodos[m.id] = limpio; }
+  guardar();
+  pintarRefugio();
+  document.getElementById("globo-refugio").textContent =
+    "¡Qué lindo nombre! Ahora se llama " + nombreAnimal(m) + " 💗";
 }
 
 function pintarTienda(){
@@ -963,6 +1117,8 @@ function importar(archivo){
       ESTADO.sonido    = (d.sonido !== false);
       ESTADO.progreso  = (d.progreso && typeof d.progreso === "object") ? d.progreso : {};
       ESTADO.sesion    = (d.sesion && typeof d.sesion === "object") ? d.sesion : {dia:"", misiones:0};
+      ESTADO.apodos    = (d.apodos && typeof d.apodos === "object") ? d.apodos : {};
+      ESTADO.racha     = (d.racha && typeof d.racha === "object") ? d.racha : {dias:0, ultimo:""};
       if(guardar()){
         avisar("Refugio recuperado 💗");
         pintarMapa(); pintarRefugio(); pintarReporte(); pintarBotonSonido(); pintarSaludo();
@@ -995,9 +1151,13 @@ function pintarBotonSonido(){
   document.getElementById("btn-sonido-juego").textContent = t;
 }
 function pintarSaludo(){
-  document.getElementById("saludo-inicio").textContent = ESTADO.nombre
+  const base = ESTADO.nombre
     ? "¡Qué bueno verte, " + ESTADO.nombre + "! 🐾"
     : "Juega, aprende y llena tu refugio de amiguitos";
+  const r = ESTADO.racha || {dias:0};
+  document.getElementById("saludo-inicio").innerHTML = r.dias > 1
+    ? base + '<br><strong style="color:#E13B84">' + r.dias + ' días seguidos ⭐</strong>'
+    : base;
 }
 function alternarSonido(){
   ESTADO.sonido = !ESTADO.sonido;
@@ -1066,9 +1226,26 @@ document.getElementById("btn-a-refugio").addEventListener("click", function(){
 });
 document.getElementById("btn-sonido").addEventListener("click", alternarSonido);
 document.getElementById("btn-sonido-juego").addEventListener("click", alternarSonido);
-document.getElementById("btn-adultos").addEventListener("click", function(){
-  acento(); pintarReporte(); ir("p-adultos");
-});
+/* La huellita de adultos se abre con un toque largo de 1,5 segundos.
+   Un toque corto no hace nada, así que ella no cae ahí sin querer. */
+(function(){
+  const h = document.getElementById("btn-adultos");
+  let t = null;
+  function empezar(ev){
+    ev.preventDefault();
+    h.classList.add("apretando");
+    t = setTimeout(function(){
+      h.classList.remove("apretando");
+      acento(); pintarReporte(); ir("p-adultos");
+    }, 1500);
+  }
+  function soltar(){ clearTimeout(t); h.classList.remove("apretando"); }
+  h.addEventListener("mousedown", empezar);
+  h.addEventListener("touchstart", empezar, {passive:false});
+  ["mouseup","mouseleave","touchend","touchcancel"].forEach(function(e){
+    h.addEventListener(e, soltar);
+  });
+})();
 document.getElementById("btn-exportar").addEventListener("click", exportar);
 document.getElementById("btn-importar").addEventListener("click", function(){
   document.getElementById("archivo-importar").click();
