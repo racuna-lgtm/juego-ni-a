@@ -403,7 +403,7 @@ const FELICES = [
 /* Pausas: chiste + dato curioso. Humor simple y visual, para 7 años. */
 const PAUSAS = [
   {ch:"¿Qué le dice un gusanito a otro gusanito? — «Voy a dar una vuelta a la manzana». 🍎🐛", da:"Las mariposas sienten el sabor de las flores… ¡con las patitas! 🦋"},
-  {ch:"¿Qué hace una abeja en el gimnasio? — ¡Zum-ba! 🐝", da:"Un colibrí mueve sus alas tan rápido que casi no se le ven: 80 veces en un segundo. 🐦"},
+  {ch:"¿Por qué el elefante no usa computador? — Porque le tiene miedo al ratón. 🐘🐭", da:"Un colibrí mueve sus alas tan rápido que casi no se le ven: 80 veces en un segundo. 🐦"},
   {ch:"¿Qué le dice el número 0 al número 8? — «¡Qué lindo cinturón!» 0️⃣8️⃣", da:"Si sumas todos los números del 1 al 100 te da 5.050. ¡Lo descubrió un niño en clases! 🔢"},
   {ch:"¿Cuál es el último animal del mundo? — El delfín. El-del-fin. 🐬", da:"Los delfines se llaman entre ellos con un silbido distinto para cada uno, como un nombre. 🐬"},
   {ch:"¿Qué le dijo una pared a la otra pared? — «Nos vemos en la esquina». 🧱", da:"Las nutrias se toman de la manito para dormir y no separarse en el agua. 🦦"},
@@ -413,15 +413,15 @@ const PAUSAS = [
   {ch:"Mamá, mamá, en el colegio me dicen despistada. — Niña, esta es la casa del vecino. 🏠", da:"Un pulpo tiene tres corazones y su sangre es azul. 🐙"},
   {ch:"¿Qué le dice un semáforo a otro? — «No me mires, que me estoy cambiando». 🚦", da:"En Chile vive el pudú, el ciervo más pequeño del mundo: es del porte de un perro chico. 🦌"},
   {ch:"¿Cómo se llama el campeón japonés de buceo? — Tokofondo. Y el segundo lugar: Kasi Tokofondo. 🤿", da:"En el desierto de Atacama hay lugares donde nunca se ha registrado ni una gota de lluvia. 🏜️"},
-  {ch:"¿Qué hace un elefante cuando se cae al agua? — Se moja. 🐘💦", da:"Los elefantes se saludan enrollando sus trompas, como un abrazo. 🐘"},
+  {ch:"¿Cómo sabes que pasó un elefante por el refrigerador? — Por las pisadas en la mantequilla. 🐘🧈", da:"Los elefantes se saludan enrollando sus trompas, como un abrazo. 🐘"},
   {ch:"¿Por qué el libro de matemática andaba triste? — Porque tenía muchos problemas. 📚", da:"El cerebro no siente dolor. Aunque te duela la cabeza, ¡no le duele a él! 🧠"},
-  {ch:"¿Qué le dijo la cuchara al azúcar? — «Nos vemos en el café». ☕", da:"Los flamencos son rosados por lo que comen. ¡Nacen grises! 🦩"},
+  {ch:"¿Qué le dice la cucharita a la gelatina? — «No tiembles, cobarde». 🥄", da:"Los flamencos son rosados por lo que comen. ¡Nacen grises! 🦩"},
   {ch:"¿Qué hace la nube cuando le da risa? — Se llueve de la risa. ☁️", da:"Ningún copo de nieve es igual a otro: cada uno tiene su propio dibujo. ❄️"},
-  {ch:"¿Cuál es el animal más antiguo? — La cebra, porque está en blanco y negro. 🦓", da:"Las rayas de cada cebra son distintas, como nuestras huellas digitales. 🦓"},
+  {ch:"¿Cuál es el animal que tiene los pies en la cabeza? — El piojo. 🐜", da:"Las rayas de cada cebra son distintas, como nuestras huellas digitales. 🦓"},
   {ch:"¿Qué le dice un pez a otro pez cuando se enojan? — ¡Nada, nada! 🐟", da:"Las tortugas pueden respirar bajo el agua un ratito larguísimo: algunas aguantan horas. 🐢"},
   {ch:"¿Cómo se llama el amigo japonés que siempre llega mojado? — Kaio Alagua. 💦", da:"La llama, cuando se enoja, escupe. Por eso mejor pedirle permiso. 🦙"},
-  {ch:"¿Qué hace un gato en el computador? — ¡Miau-se! (mouse) 🐱🖱️", da:"Los gatos duermen unas 16 horas al día. ¡Casi todo el día durmiendo! 🐱"},
-  {ch:"¿Qué le dice una impresora a otra? — «Esa hoja es tuya o es impresión mía». 🖨️", da:"El árbol más alto del mundo mide más que un edificio de 30 pisos. 🌲"}
+  {ch:"¿Qué hace una vaca cuando sale el sol? — Sombra. 🐮☀️", da:"Los gatos duermen unas 16 horas al día. ¡Casi todo el día durmiendo! 🐱"},
+  {ch:"¿Por qué las focas del circo miran siempre para arriba? — Porque ahí están los focos. 🎪", da:"El árbol más alto del mundo mide más que un edificio de 30 pisos. 🌲"}
 ];
 
 /* ============================================================
