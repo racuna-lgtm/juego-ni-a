@@ -1,0 +1,20 @@
+{
+  "name": "El Refugio de Theo",
+  "short_name": "Refugio",
+  "description": "Juego de repaso escolar de 2° básico: Lenguaje, Matemática, Ciencias, Historia e Inglés.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFE7F1",
+  "theme_color": "#FFE7F1",
+  "lang": "es-CL",
+  "icons": [
+    {
+      "src": "./icono.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
