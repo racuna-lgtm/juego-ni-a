@@ -69,7 +69,7 @@ body{
   display:flex; align-items:center; justify-content:center; color:var(--texto);
 }
 .btn-icono:active{transform:scale(.94);}
-.btn-icono:focus-visible, .btn:focus-visible, .mini:focus-visible, input:focus-visible, .cosa:focus-visible{
+.btn-icono:focus-visible, .btn:focus-visible, .mini:focus-visible, .enlace-adultos:focus-visible, input:focus-visible, .cosa:focus-visible{
   outline:4px solid #1B7FD4; outline-offset:3px;
 }
 
@@ -114,6 +114,7 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 @keyframes brinca{0%,100%{transform:scale(1);} 40%{transform:scale(1.06);}}
 @keyframes tiembla{0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);}}
 
+.btn.texto-solo{justify-content:center; text-align:center; font-size:26px; font-weight:bold;}
 #opciones.doble{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 #opciones.doble .btn{
   flex-direction:column; gap:6px; text-align:center; margin-bottom:0;
@@ -191,8 +192,12 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
   padding:13px 14px; font-family:var(--fuente); font-size:17px; color:var(--texto);
   width:100%; margin-bottom:10px; cursor:pointer; text-align:center;
 }
-.reporte{width:100%; border-collapse:collapse; font-size:15px; background:var(--crema); border-radius:18px; overflow:hidden;}
-.reporte th,.reporte td{padding:9px 10px; text-align:left; border-bottom:1px solid #F0DDE6;}
+.enlace-adultos{
+  background:none; border:0; padding:12px; margin-top:2px;
+  font-family:var(--fuente); font-size:14px; color:var(--texto-suave);
+  text-decoration:underline; cursor:pointer;
+}
+.reporte{width:100%; border-collapse:collapse; font-size:15px; background:var(--crema); border-radius:18px; overflow:hidden;}.reporte th,.reporte td{padding:9px 10px; text-align:left; border-bottom:1px solid #F0DDE6;}
 .reporte th{background:#F7E7EF; font-size:14px;}
 .reporte td.n{text-align:right; white-space:nowrap;}
 
@@ -245,7 +250,7 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       <button class="btn suave" id="btn-ver-refugio">Mi refugio 🏡</button>
     </div>
     <div class="pie">Hecho con cariño para ti 💗<br>
-      <button class="mini" id="btn-adultos" style="margin-top:10px; width:auto; padding:9px 18px;">Para adultos</button>
+      <button class="enlace-adultos" id="btn-adultos">Para adultos</button>
     </div>
   </section>
 
@@ -344,11 +349,13 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       necesitó más de un intento. No es una nota: es solo para saber qué reforzar.</p>
       <div id="reporte"></div>
       <p style="margin-top:14px;"><strong>El contenido</strong><br>
-      261 preguntas basadas en los Objetivos de Aprendizaje de 2° básico del Mineduc:
+      464 preguntas basadas en los Objetivos de Aprendizaje de 2° básico del Mineduc:
       Lenguaje, Matemática, Ciencias Naturales, e Historia y Geografía. Inglés sigue la
       propuesta curricular de 1° a 4° básico, porque esa asignatura es obligatoria recién
       desde 5° básico. Las preguntas no se repiten hasta recorrer toda la asignatura, y
-      las que le costaron vuelven a aparecer un par de misiones después.</p>
+      las que le costaron vuelven a aparecer un par de misiones después. Matemática
+      arma además preguntas nuevas cada vez, con números al azar dentro del ámbito del
+      0 al 100 y las tablas del 2, del 5 y del 10: esas no se acaban nunca.</p>
       <p><strong>Dónde se guardan los datos</strong><br>
       Solo en este dispositivo, dentro del navegador. No se envía nada a internet, no hay
       cuenta ni base de datos. <strong>Si se borran los datos del navegador, el refugio se
@@ -372,6 +379,7 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 <div id="aviso" role="status"></div>
 
 <script src="./datos.js"></script>
+<script src="./generador.js"></script>
 <script>
 "use strict";
 
@@ -400,6 +408,8 @@ function progresoDe(id){
   if(!Array.isArray(p.pendientes)) p.pendientes = [];
   if(!p.errores || typeof p.errores !== "object") p.errores = {};
   if(typeof p.respondidas !== "number") p.respondidas = 0;
+  if(!Array.isArray(p.temasFlojos)) p.temasFlojos = [];
+  if(!Array.isArray(p.genRecientes)) p.genRecientes = [];
   return p;
 }
 
@@ -544,7 +554,7 @@ function pintarMapa(){
     const ganado = ESTADO.animales.indexOf(m.id) !== -1;
     b.innerHTML = '<span class="emoji">' + m.emoji + '</span>' +
       '<span>' + m.nombre +
-        '<span class="avance">' + p.respondidas + ' de ' + m.preguntas.length + ' preguntas</span>' +
+        '<span class="avance">' + (m.generado ? 'preguntas nuevas siempre' : p.respondidas + ' de ' + m.preguntas.length + ' preguntas') + '</span>' +
       '</span>' +
       (ganado ? '<span class="listo">' + m.animal.e + '</span>' : '');
     b.addEventListener("click", function(){ iniciarMision(m.id); });
@@ -604,7 +614,17 @@ function iniciarMision(idMateria){
   if(!materia) return;
   prepararAudio();
   acento(materia.color, materia.colorClaro);
-  mision = { materia:materia, indices:elegirPreguntas(materia), indice:0, fallo:false };
+  let items = elegirPreguntas(materia).map(function(i){
+    return { preg:materia.preguntas[i], idx:i };
+  });
+  if(materia.generado && typeof generarMatematica === "function"){
+    // 2 preguntas del banco (figuras, hora, medir) + 3 recien inventadas
+    const pr = progresoDe(materia.id);
+    items = items.slice(0, 2);
+    generarMatematica(3, pr.temasFlojos, pr.genRecientes).forEach(function(q){ items.push({ preg:q, idx:null }); });
+    items = barajar(items);
+  }
+  mision = { materia:materia, items:items, indice:0, fallo:false };
   document.getElementById("chip-materia").textContent = materia.emoji + " " + materia.nombre;
   ir("p-juego");
   pintarPregunta();
@@ -612,16 +632,16 @@ function iniciarMision(idMateria){
 
 function pintarProgreso(){
   let huellas = "";
-  for(let i = 0; i < mision.indices.length; i++){
+  for(let i = 0; i < mision.items.length; i++){
     huellas += (i <= mision.indice) ? "🐾" : '<span class="off">🐾</span>';
   }
   document.getElementById("progreso").innerHTML =
-    "Pregunta " + (mision.indice + 1) + " de " + mision.indices.length +
+    "Pregunta " + (mision.indice + 1) + " de " + mision.items.length +
     '<span class="huellas">' + huellas + '</span>';
 }
 
 function pintarPregunta(){
-  const preg = mision.materia.preguntas[mision.indices[mision.indice]];
+  const preg = mision.items[mision.indice].preg;
   mision.fallo = false;
   pintarProgreso();
 
@@ -664,8 +684,14 @@ function pintarPregunta(){
 
   opciones.forEach(function(op){
     const b = document.createElement("button");
-    b.className = "btn";
-    b.innerHTML = '<span class="emoji">' + op.e + '</span><span>' + op.t + '</span>';
+    if(op.e){
+      b.className = "btn";
+      b.innerHTML = '<span class="emoji">' + op.e + '</span><span>' + op.t + '</span>';
+    }else{
+      // sin dibujo: la palabra ocupa todo el botón, grande y centrada
+      b.className = "btn texto-solo";
+      b.textContent = op.t;
+    }
     b.addEventListener("click", function(){ responder(b, op.correcta, preg); });
     cont.appendChild(b);
   });
@@ -704,7 +730,7 @@ function responder(boton, esCorrecta, preg){
   caja.textContent = preg.x;
   exp.appendChild(caja);
 
-  const ultima = (mision.indice === mision.indices.length - 1);
+  const ultima = (mision.indice === mision.items.length - 1);
   const zona = document.getElementById("zona-siguiente");
   zona.innerHTML = "";
   const b = document.createElement("button");
@@ -723,7 +749,21 @@ function responder(boton, esCorrecta, preg){
 /* Marca la pregunta como respondida y, si le costó, la programa para volver. */
 function registrarRespuesta(preg){
   const p = progresoDe(mision.materia.id);
-  const idx = mision.indices[mision.indice];
+  const idx = mision.items[mision.indice].idx;
+
+  if(mision.fallo) p.errores[preg.k] = (p.errores[preg.k] || 0) + 1;
+
+  if(idx === null){
+    // pregunta inventada por el generador: no tiene numero de posicion,
+    // pero se anota el tema para volver a insistir en el
+    if(mision.fallo && p.temasFlojos.indexOf(preg.k) === -1){
+      p.temasFlojos.push(preg.k);
+      if(p.temasFlojos.length > 6) p.temasFlojos.shift();
+    }
+    p.genRecientes.push(preg.p + "|" + (preg.v || ""));
+    if(p.genRecientes.length > 60) p.genRecientes.shift();
+    return;
+  }
 
   if(p.vistas.indexOf(idx) === -1){
     p.vistas.push(idx);
@@ -733,7 +773,6 @@ function registrarRespuesta(preg){
   p.pendientes.forEach(function(pen){ pen.espera--; });
 
   if(mision.fallo){
-    p.errores[preg.k] = (p.errores[preg.k] || 0) + 1;
     p.pendientes.push({ i:idx, espera:2 });
     if(p.pendientes.length > 12) p.pendientes.shift();
   }
@@ -887,7 +926,7 @@ function pintarReporte(){
     const temas = Object.keys(p.errores).sort(function(a,b){ return p.errores[b] - p.errores[a]; }).slice(0,3);
     filas += "<tr><td><strong>" + m.nombre + "</strong><br><span style='color:#6E5260'>" +
       (temas.length ? "Le costó: " + temas.join(", ") : "Sin temas difíciles por ahora") +
-      "</span></td><td class='n'>" + p.respondidas + " / " + m.preguntas.length + "</td></tr>";
+      "</span></td><td class='n'>" + (m.generado ? "sin límite" : p.respondidas + " / " + m.preguntas.length) + "</td></tr>";
   });
   document.getElementById("reporte").innerHTML =
     '<table class="reporte"><tr><th>Asignatura</th><th class="n">Respondidas</th></tr>' + filas + '</table>';
