@@ -7,12 +7,13 @@
    versión vieja que tiene guardada.
    ============================================================ */
 
-const VERSION = "refugio-theo-v3";
+const VERSION = "refugio-theo-v5";
 
 const ARCHIVOS = [
   "./",
   "./index.html",
   "./datos.js",
+  "./generador.js",
   "./manifest.json",
   "./icono.svg"
 ];
