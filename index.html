@@ -125,6 +125,18 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
 .mision{position:relative;}
 .mision .listo{position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:28px;}
 .mision .avance{display:block; font-size:14px; color:var(--texto-suave); margin-top:2px;}
+.mision .medallas{display:block; font-size:15px; letter-spacing:2px; margin-top:2px;}
+.insignia{
+  display:inline-block; margin-top:10px; background:#FFF3D1; border:3px solid #E8A400;
+  border-radius:999px; padding:6px 16px; font-size:17px; color:#7A5600; font-weight:bold;
+}
+.dorada.reto{background:#EDE4FF; border-color:#7C4DD6; color:#4B2A96;}
+.niveles{display:inline-flex; gap:4px;}
+.niveles button{
+  font-family:var(--fuente); font-size:15px; min-width:34px; height:34px; border-radius:10px;
+  border:2px solid #E7CBD9; background:#fff; color:var(--texto); cursor:pointer;
+}
+.niveles button.activo{background:var(--rosa); border-color:var(--rosa); color:#fff; font-weight:bold;}
 
 .progreso{text-align:center; margin:0 0 12px; font-size:17px; color:var(--texto-suave);}
 .huellas{font-size:22px; letter-spacing:4px; display:block; margin-top:2px;}
@@ -305,6 +317,21 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
     <div id="zona-siguiente"></div>
   </section>
 
+  <!-- ============ DESAFÍO (opcional, al final de cada misión) ============ -->
+  <section class="pantalla" id="p-desafio">
+    <div class="theo">
+      <div class="cara">🐶</div>
+      <div class="globo" id="globo-desafio">¡Terminaste las cinco!</div>
+    </div>
+    <div class="tarjeta" style="text-align:center;">
+      <div style="font-size:72px; line-height:1.1;">💪</div>
+      <div style="font-size:22px; font-weight:bold;">Pregunta desafío</div>
+      <div style="font-size:17px; color:var(--texto-suave); margin-top:4px;">Es más difícil. Si la aciertas a la primera ganas 5 ⭐</div>
+    </div>
+    <button class="btn principal" id="btn-desafio-si">¡Me atrevo! 💪</button>
+    <button class="btn suave" id="btn-desafio-no">Ahora no, terminar 🎉</button>
+  </section>
+
   <!-- ============ PAUSA ============ -->
   <section class="pantalla" id="p-pausa">
     <div class="theo">
@@ -363,17 +390,29 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
     <h2>Para adultos</h2>
     <div class="adultos">
       <p><strong>Cómo va</strong><br>
-      Cuántas preguntas distintas ha respondido de cada asignatura y en qué temas
-      necesitó más de un intento. No es una nota: es solo para saber qué reforzar.</p>
+      En qué temas necesitó más de un intento y en qué nivel está cada asignatura.
+      No es una nota: es solo para saber qué reforzar.</p>
+      <p><strong>Los niveles</strong><br>
+      Cada asignatura tiene 3 niveles y se ajusta sola: sube cuando acierta 5 preguntas
+      seguidas a la primera, y baja sin avisarle si en las últimas 6 tuvo que reintentar
+      3 veces. Cuando sube, Theo se lo anuncia en la pausa y en el mapa gana una estrella
+      que no se pierde aunque el nivel baje. En nivel 2 y 3 la primera pregunta de cada
+      misión es del nivel anterior, para que parta con un acierto. Si quieres, puedes
+      fijar el nivel a mano con los botones de la tabla.</p>
       <div id="reporte"></div>
       <p style="margin-top:14px;"><strong>El contenido</strong><br>
-      464 preguntas basadas en los Objetivos de Aprendizaje de 2° básico del Mineduc:
-      Lenguaje, Matemática, Ciencias Naturales, e Historia y Geografía. Inglés sigue la
-      propuesta curricular de 1° a 4° básico, porque esa asignatura es obligatoria recién
-      desde 5° básico. Las preguntas no se repiten hasta recorrer toda la asignatura, y
-      las que le costaron vuelven a aparecer un par de misiones después. Matemática
-      arma además preguntas nuevas cada vez, con números al azar dentro del ámbito del
-      0 al 100 y las tablas del 2, del 5 y del 10: esas no se acaban nunca.</p>
+      1087 preguntas basadas en los Objetivos de Aprendizaje de 2° básico del Mineduc:
+      Lenguaje, Matemática, Ciencias Naturales, e Historia y Geografía. El nivel 3 suma
+      algunos contenidos de 3° básico (pronombres, plantas, luz y sonido, sistema solar,
+      el ecuador y los derechos del niño). Inglés sigue la propuesta curricular de 1° a 4°
+      básico, porque esa asignatura es obligatoria recién desde 5° básico. Las preguntas no
+      se repiten hasta recorrer todo el nivel, y las que le costaron vuelven un par de
+      misiones después. Además, en nivel 2 y 3 todas las materias inventan preguntas nuevas
+      cada vez, mezcladas con las del banco fijo: Matemática (sumas y restas, tablas,
+      problemas y repartir), Inglés (vocabulario y frases), Lenguaje (sinónimos, antónimos,
+      plural, familias de palabras), Ciencias (sentidos, estados de la materia, vertebrados
+      e invertebrados, hábitats) e Historia (oficios, antes y ahora). Así nunca se queda sin
+      preguntas nuevas aunque juegue todos los días.</p>
       <p><strong>Dónde se guardan los datos</strong><br>
       Solo en este dispositivo, dentro del navegador. No se envía nada a internet, no hay
       cuenta ni base de datos. <strong>Si se borran los datos del navegador, el refugio se
@@ -386,8 +425,10 @@ h2{font-size:24px; margin:0 0 12px; text-align:center;}
       Una pregunta por pantalla, sin cronómetro y sin puntaje que baje. Los errores no
       restan: la opción equivocada se apaga con un mensaje de ánimo y puede reintentar las
       veces que quiera. Al acertar, Theo explica en una línea por qué esa era la respuesta.
-      Las misiones son de 5 preguntas y a la tercera seguida Theo propone dejarlo para
-      mañana. Los sonidos suenan solo al acertar y al terminar una misión.</p>
+      Acertar a la primera da una estrella extra (reintentar igual suma). Las misiones son de
+      5 preguntas; al final Theo ofrece una pregunta desafío opcional que vale más, y a la
+      tercera misión seguida propone dejarlo para mañana. Los sonidos suenan solo al
+      acertar y al terminar una misión.</p>
     </div>
   </section>
 
@@ -430,6 +471,10 @@ function progresoDe(id){
   if(typeof p.respondidas !== "number") p.respondidas = 0;
   if(!Array.isArray(p.temasFlojos)) p.temasFlojos = [];
   if(!Array.isArray(p.genRecientes)) p.genRecientes = [];
+  if(p.nivel !== 1 && p.nivel !== 2 && p.nivel !== 3) p.nivel = 1;
+  if(typeof p.nivelMax !== "number" || p.nivelMax < p.nivel) p.nivelMax = p.nivel;
+  if(!Array.isArray(p.ventana)) p.ventana = [];      // últimas respuestas: true = acertó a la primera
+  if(typeof p.subio !== "number") p.subio = 0;       // nivel nuevo que Theo debe anunciar en la pausa
   return p;
 }
 
@@ -594,8 +639,9 @@ function pintarMapa(){
     b.className = "btn mision";
     b.style.borderColor = m.color;
     const ganado = ESTADO.animales.indexOf(m.id) !== -1;
+    const medallas = "⭐".repeat(p.nivelMax) + "☆".repeat(3 - p.nivelMax);
     b.innerHTML = '<span class="emoji">' + m.emoji + '</span>' +
-      '<span>' + m.nombre + '</span>' +
+      '<span>' + m.nombre + '<span class="medallas" aria-label="Nivel ' + p.nivelMax + ' de 3">' + medallas + '</span></span>' +
       (ganado ? '<span class="listo">' + m.animal.e + '</span>' : '');
     b.addEventListener("click", function(){ iniciarMision(m.id); });
     cont.appendChild(b);
@@ -627,35 +673,69 @@ function pintarMapa(){
    ============================================================ */
 let mision = null;
 
-/* Elige 5 preguntas: primero las que le costaron y ya descansaron,
-   después las que nunca ha visto. No marca nada todavía: se marca
-   al responder, así salir a la mitad no le quema preguntas. */
-function elegirPreguntas(materia){
+function nivelDe(materia, i){ return materia.preguntas[i].n || 1; }
+
+/* Busca preguntas de un nivel que todavía no haya visto. Si ya recorrió
+   todas las de ese nivel, reinicia SOLO ese nivel (dejando fuera las
+   últimas que vio, para que no se repitan seguidas). */
+function sinVer(materia, nivel, cuantas, excluir){
   const p = progresoDe(materia.id);
-  const total = materia.preguntas.length;
-  const elegidas = [];
-
-  const listas = [];
-  for(let i = 0; i < p.pendientes.length; i++){
-    if(p.pendientes[i].espera <= 0) listas.push(p.pendientes[i].i);
-  }
-  barajar(listas).slice(0,2).forEach(function(i){ elegidas.push(i); });
-
-  let nuevas = [];
-  for(let i = 0; i < total; i++){
-    if(p.vistas.indexOf(i) === -1 && elegidas.indexOf(i) === -1) nuevas.push(i);
-  }
-  if(nuevas.length < (5 - elegidas.length)){
-    const recientes = p.vistas.slice(-6);
-    p.vistas = recientes.slice();
-    nuevas = [];
-    for(let i = 0; i < total; i++){
-      if(recientes.indexOf(i) === -1 && elegidas.indexOf(i) === -1) nuevas.push(i);
+  const buscar = function(){
+    const lista = [];
+    for(let i = 0; i < materia.preguntas.length; i++){
+      if(nivelDe(materia, i) === nivel && p.vistas.indexOf(i) === -1 && excluir.indexOf(i) === -1) lista.push(i);
     }
+    return lista;
+  };
+  let lista = buscar();
+  if(lista.length < cuantas){
+    const delNivel = p.vistas.filter(function(i){ return i < materia.preguntas.length && nivelDe(materia, i) === nivel; });
+    const recientes = delNivel.slice(-6);
+    p.vistas = p.vistas.filter(function(i){
+      return i >= materia.preguntas.length || nivelDe(materia, i) !== nivel || recientes.indexOf(i) !== -1;
+    });
+    lista = buscar();
   }
-  barajar(nuevas).slice(0, 5 - elegidas.length).forEach(function(i){ elegidas.push(i); });
+  return barajar(lista).slice(0, cuantas);
+}
 
-  return barajar(elegidas);
+/* Elige las preguntas de la misión según el nivel de la niña en esa materia:
+   - hasta 2 repasos de lo que le costó,
+   - en nivel 2 o 3, la primera es del nivel anterior, para partir con un acierto,
+   - el resto, de su nivel.
+   No marca nada todavía: se marca al responder, así salir a la mitad no le quema preguntas. */
+function elegirPreguntas(materia, cantidad, conCalentamiento){
+  const total = (typeof cantidad === "number") ? cantidad : 5;
+  const p = progresoDe(materia.id);
+  const N = p.nivel;
+  const calentar = (conCalentamiento !== false) && N > 1 && total > 1;
+
+  const repasos = [];
+  for(let i = 0; i < p.pendientes.length; i++){
+    const pen = p.pendientes[i];
+    if(pen.espera <= 0 && pen.i < materia.preguntas.length && nivelDe(materia, pen.i) <= N) repasos.push(pen.i);
+  }
+  const elegidas = barajar(repasos).slice(0, Math.min(2, total - (calentar ? 2 : 1)));
+
+  let primera = [];
+  if(calentar) primera = sinVer(materia, N - 1, 1, elegidas);
+
+  const faltan = total - elegidas.length - primera.length;
+  let resto = sinVer(materia, N, faltan, elegidas.concat(primera));
+  // si el nivel tiene pocas preguntas, se completa con el nivel anterior
+  for(let n = N - 1; n >= 1 && resto.length < faltan; n--){
+    resto = resto.concat(sinVer(materia, n, faltan - resto.length, elegidas.concat(primera, resto)));
+  }
+  return primera.concat(barajar(elegidas.concat(resto)));
+}
+
+/* Cada materia sin generador propio (matemática e inglés ya tienen el suyo) usa
+   una función "generarX" con la misma firma: (cantidad, nivel, evitar) => [preguntas]. */
+function generadorDe(idMateria){
+  if(idMateria === "lenguaje" && typeof generarLenguaje === "function") return generarLenguaje;
+  if(idMateria === "ciencias" && typeof generarCiencias === "function") return generarCiencias;
+  if(idMateria === "historia" && typeof generarHistoria === "function") return generarHistoria;
+  return null;
 }
 
 function iniciarMision(idMateria){
@@ -663,19 +743,32 @@ function iniciarMision(idMateria){
   if(!materia) return;
   prepararAudio();
   acento(materia.color, materia.colorClaro);
-  let items = elegirPreguntas(materia).map(function(i){
-    return { preg:materia.preguntas[i], idx:i };
-  });
+  const pr = progresoDe(materia.id);
+  const aItem = function(i){ return { preg:materia.preguntas[i], idx:i }; };
+  let items;
   if(materia.generado && typeof generarMatematica === "function"){
-    // 2 preguntas del banco (figuras, hora, medir) + 3 recien inventadas
-    const pr = progresoDe(materia.id);
-    items = items.slice(0, 2);
-    generarMatematica(3, pr.temasFlojos, pr.genRecientes).forEach(function(q){ items.push({ preg:q, idx:null }); });
-    items = barajar(items);
+    // 2 del banco (figuras, calendario, medir, gráficos) + 3 inventadas en el momento
+    const banco = elegirPreguntas(materia, 2).map(aItem);
+    const nuevas = generarMatematica(3, pr.temasFlojos, pr.genRecientes, pr.nivel).map(function(q){ return { preg:q, idx:null }; });
+    items = [banco[0]].concat(barajar(banco.slice(1).concat(nuevas)));
+  }else if(materia.id === "ingles" && pr.nivel > 1 && typeof generarIngles === "function"){
+    // 3 del banco (frases y lecturas) + 2 de vocabulario inventadas
+    const banco = elegirPreguntas(materia, 3).map(aItem);
+    const nuevas = generarIngles(2, pr.nivel, pr.genRecientes).map(function(q){ return { preg:q, idx:null }; });
+    items = [banco[0]].concat(barajar(banco.slice(1).concat(nuevas)));
+  }else if(pr.nivel > 1 && typeof generadorDe(materia.id) === "function"){
+    // 3 del banco + 2 inventadas por plantillas (lenguaje, ciencias, historia)
+    const gen = generadorDe(materia.id);
+    const banco = elegirPreguntas(materia, 3).map(aItem);
+    const nuevas = gen(2, pr.nivel, pr.genRecientes).map(function(q){ return { preg:q, idx:null }; });
+    items = [banco[0]].concat(barajar(banco.slice(1).concat(nuevas)));
+  }else{
+    items = elegirPreguntas(materia, 5).map(aItem);
   }
+  items = items.filter(function(it){ return it && it.preg; });
   items.forEach(function(it){ it.materia = materia; });
   if(Math.random() < 0.3 && items.length) items[azarEntero(0, items.length - 1)].dorada = true;
-  mision = { materia:materia, items:items, indice:0, fallo:false };
+  mision = { materia:materia, items:items, indice:0, fallo:false, desafioOfrecido:false, subioAntes:{} };
   document.getElementById("chip-materia").textContent = materia.emoji + " " + materia.nombre;
   ir("p-juego");
   pintarPregunta();
@@ -687,20 +780,27 @@ function iniciarMezcla(){
   acento("#E13B84", "#FFEAF3");
   const items = [];
   MATERIAS.forEach(function(m){
+    const p = progresoDe(m.id);
+    const gen = generadorDe(m.id);
     if(m.generado && typeof generarMatematica === "function"){
-      const p = progresoDe(m.id);
-      const q = generarMatematica(1, p.temasFlojos, p.genRecientes)[0];
+      const q = generarMatematica(1, p.temasFlojos, p.genRecientes, p.nivel)[0];
+      if(q) items.push({ preg:q, idx:null, materia:m });
+    }else if(m.id === "ingles" && p.nivel > 1 && typeof generarIngles === "function" && Math.random() < 0.4){
+      const q = generarIngles(1, p.nivel, p.genRecientes)[0];
+      if(q) items.push({ preg:q, idx:null, materia:m });
+    }else if(p.nivel > 1 && gen && Math.random() < 0.4){
+      const q = gen(1, p.nivel, p.genRecientes)[0];
       if(q) items.push({ preg:q, idx:null, materia:m });
     }else{
-      const idxs = elegirPreguntas(m);
-      items.push({ preg:m.preguntas[idxs[0]], idx:idxs[0], materia:m });
+      const idxs = elegirPreguntas(m, 1, false);
+      if(idxs.length) items.push({ preg:m.preguntas[idxs[0]], idx:idxs[0], materia:m });
     }
   });
   const mezcla = { id:"mezcla", nombre:"Misión mezclada", emoji:"🌈", color:"#E13B84",
                    animal:{ e:"🌈", nombre:"Arcoíris", tipo:"sorpresa" }, preguntas:[] };
   const lista = barajar(items);
   if(Math.random() < 0.4 && lista.length) lista[azarEntero(0, lista.length - 1)].dorada = true;
-  mision = { materia:mezcla, items:lista, indice:0, fallo:false };
+  mision = { materia:mezcla, items:lista, indice:0, fallo:false, desafioOfrecido:true, subioAntes:{} };
   document.getElementById("chip-materia").textContent = "🌈 Mezclada";
   ir("p-juego");
   pintarPregunta();
@@ -709,6 +809,7 @@ function iniciarMezcla(){
 function pintarProgreso(){
   let huellas = "";
   for(let i = 0; i < mision.items.length; i++){
+    if(mision.items[i].desafio){ huellas += " 💪"; continue; }
     huellas += (i <= mision.indice) ? "🐾" : '<span class="off">🐾</span>';
   }
   document.getElementById("progreso").innerHTML = '<span class="huellas">' + huellas + '</span>';
@@ -719,7 +820,12 @@ function pintarPregunta(){
   const preg = item.preg;
   const dor = document.getElementById("aviso-dorada");
   dor.innerHTML = "";
-  if(item.dorada){
+  if(item.desafio){
+    const d = document.createElement("div");
+    d.className = "dorada reto";
+    d.textContent = "💪 Pregunta desafío · a la primera vale 5 ⭐";
+    dor.appendChild(d);
+  }else if(item.dorada){
     const d = document.createElement("div");
     d.className = "dorada";
     d.textContent = "⭐ ¡Pregunta dorada! Esta vale 3 estrellas";
@@ -730,8 +836,9 @@ function pintarPregunta(){
 
   document.getElementById("cara-theo").textContent = "🐶";
   document.getElementById("globo-juego").textContent =
-    (mision.indice === 0) ? "¡Vamos con la primera! Tómate tu tiempo 💗"
-                          : "Vamos con la siguiente 💗";
+    item.desafio ? "¡Esta es difícil! Léela con calma, no hay apuro 💗"
+    : (mision.indice === 0) ? "¡Vamos con la primera! Tómate tu tiempo 💗"
+    : "Vamos con la siguiente 💗";
 
   const enun = document.getElementById("enunciado");
   enun.innerHTML = "";
@@ -796,8 +903,12 @@ function responder(boton, esCorrecta, preg){
   boton.classList.add("correcta");
 
   const item = mision.items[mision.indice];
+  const aLaPrimera = !mision.fallo;
   registrarRespuesta(preg);
-  ESTADO.estrellas += item.dorada ? 3 : 1;
+  let gana;
+  if(item.desafio){ gana = aLaPrimera ? 5 : 2; }
+  else { gana = (item.dorada ? 3 : 1) + (aLaPrimera ? 1 : 0); }
+  ESTADO.estrellas += gana;
   guardar();
   pintarEstrellas();
   sonAcierto();
@@ -808,7 +919,12 @@ function responder(boton, esCorrecta, preg){
   const globo = document.getElementById("globo-juego");
   globo.innerHTML = "";
   const feliz = document.createElement("div");
-  feliz.textContent = alAzar(FELICES) + (item.dorada ? " ¡Y era dorada! +3 ⭐" : "");
+  if(item.desafio){
+    feliz.textContent = aLaPrimera ? "¡Increíble, la sacaste a la primera! +5 ⭐" : "¡Era difícil y lo lograste igual! +2 ⭐";
+  }else{
+    feliz.textContent = alAzar(FELICES) + (item.dorada ? " ¡Era dorada!" : "") +
+      (aLaPrimera ? " +" + gana + " ⭐ ¡A la primera!" : " +" + gana + " ⭐");
+  }
   const porque = document.createElement("div");
   porque.className = "porque";
   porque.textContent = preg.x;
@@ -817,13 +933,15 @@ function responder(boton, esCorrecta, preg){
 
 
   const ultima = (mision.indice === mision.items.length - 1);
+  const ofrecer = ultima && !mision.desafioOfrecido;
   const zona = document.getElementById("zona-siguiente");
   zona.innerHTML = "";
   const b = document.createElement("button");
   b.className = "btn principal";
-  b.textContent = ultima ? "Terminar la misión 🎉" : "Siguiente pregunta ➜";
+  b.textContent = ofrecer ? "Seguir ➜" : (ultima ? "Terminar la misión 🎉" : "Siguiente pregunta ➜");
   b.addEventListener("click", function(){
-    if(ultima){ terminarMision(); }
+    if(ofrecer){ ofrecerDesafio(); }
+    else if(ultima){ terminarMision(); }
     else { mision.indice++; pintarPregunta(); }
   });
   zona.appendChild(b);
@@ -834,10 +952,24 @@ function responder(boton, esCorrecta, preg){
 
 /* Marca la pregunta como respondida y, si le costó, la programa para volver. */
 function registrarRespuesta(preg){
-  const suMateria = mision.items[mision.indice].materia || mision.materia;
+  const item = mision.items[mision.indice];
+  const suMateria = item.materia || mision.materia;
   const p = progresoDe(suMateria.id);
-  const idx = mision.items[mision.indice].idx;
+  const idx = item.idx;
 
+  if(item.desafio){
+    // el desafío está sobre su nivel: no cuenta como "le costó" ni mueve el nivel
+    if(idx === null){
+      p.genRecientes.push(preg.p + "|" + (preg.v || ""));
+      if(p.genRecientes.length > 60) p.genRecientes.shift();
+    }else if(p.vistas.indexOf(idx) === -1){
+      p.vistas.push(idx);
+      p.respondidas = p.vistas.length;
+    }
+    return;
+  }
+
+  ajustarNivel(suMateria, p, !mision.fallo);
   if(mision.fallo) p.errores[preg.k] = (p.errores[preg.k] || 0) + 1;
 
   if(idx === null){
@@ -865,10 +997,63 @@ function registrarRespuesta(preg){
   }
 }
 
+/* El nivel se ajusta solo:
+   - sube cuando acierta 5 seguidas a la primera,
+   - baja, sin avisarle, si en las últimas 6 necesitó reintentar 3 veces.
+   El cambio se aplica desde la misión siguiente y Theo lo anuncia en la pausa. */
+function ajustarNivel(materia, p, aLaPrimera){
+  p.ventana.push(aLaPrimera);
+  if(p.ventana.length > 6) p.ventana.shift();
+  const ultimas5 = p.ventana.slice(-5);
+  const reintentos = p.ventana.filter(function(v){ return !v; }).length;
+  if(p.nivel < 3 && ultimas5.length === 5 && ultimas5.every(function(v){ return v; })){
+    p.nivel++;
+    if(p.nivel > p.nivelMax){ p.nivelMax = p.nivel; p.subio = p.nivel; }
+    p.ventana = [];
+  }else if(p.nivel > 1 && reintentos >= 3){
+    p.nivel--;
+    p.ventana = [];
+  }
+}
+
+/* Al final de cada misión, Theo ofrece una pregunta más difícil. Es opcional. */
+function ofrecerDesafio(){
+  mision.desafioOfrecido = true;
+  const m = mision.materia;
+  const nombre = ESTADO.nombre ? " " + ESTADO.nombre : "";
+  document.getElementById("globo-desafio").textContent =
+    "¡Terminaste las cinco" + nombre + "! ¿Te atreves con una más difícil? Si no, está perfecto igual 💗";
+  ir("p-desafio");
+}
+
+function armarDesafio(){
+  const m = mision.materia;
+  const p = progresoDe(m.id);
+  const D = Math.min(3, p.nivel + 1);
+  if(m.generado && typeof generarMatematica === "function"){
+    const q = generarMatematica(1, [], p.genRecientes, D)[0];
+    return q ? { preg:q, idx:null, materia:m, desafio:true } : null;
+  }
+  const usadas = mision.items.map(function(it){ return it.idx; }).filter(function(i){ return i !== null; });
+  let idx = sinVer(m, D, 1, usadas);
+  if(!idx.length && D > p.nivel) idx = sinVer(m, p.nivel, 1, usadas);
+  if(idx.length) return { preg:m.preguntas[idx[0]], idx:idx[0], materia:m, desafio:true };
+  if(m.id === "ingles" && typeof generarIngles === "function"){
+    const q = generarIngles(1, 3, p.genRecientes)[0];
+    return q ? { preg:q, idx:null, materia:m, desafio:true } : null;
+  }
+  const gen = generadorDe(m.id);
+  if(gen){
+    const q = gen(1, 3, p.genRecientes)[0];
+    return q ? { preg:q, idx:null, materia:m, desafio:true } : null;
+  }
+  return null;
+}
+
 function mostrarEstrella(){
   const p = document.getElementById("premio");
   const it = mision && mision.items[mision.indice];
-  p.firstChild.textContent = (it && it.dorada) ? "🌟" : "⭐";
+  p.firstChild.textContent = (it && (it.dorada || it.desafio)) ? "🌟" : "⭐";
   p.classList.add("ver");
   setTimeout(function(){ p.classList.remove("ver"); }, 900);
 }
@@ -904,6 +1089,18 @@ function terminarMision(){
   const globo = document.getElementById("globo-pausa");
   const btnSeguir = document.getElementById("btn-seguir");
   const completo = (ESTADO.animales.length === MATERIAS.length);
+
+  // ¿subió de nivel en alguna materia de esta misión?
+  let subida = null;
+  const materiasMision = (m.id === "mezcla") ? MATERIAS : [m];
+  materiasMision.forEach(function(mm){
+    const pp = progresoDe(mm.id);
+    if(pp.subio && !subida){ subida = { materia:mm, nivel:pp.subio }; }
+    pp.subio = 0;
+  });
+  if(subida){
+    zona.innerHTML += '<div class="insignia">🏅 Nivel ' + subida.nivel + ' de ' + subida.materia.nombre + '</div>';
+  }
   if(nuevo && completo && m.id !== "mezcla"){
     // el momento grande: llegó el último animalito
     zona.innerHTML = '<div style="font-size:64px; line-height:1.2;">🦄 🐰 🐢 🦙 🦊</div>' +
@@ -911,12 +1108,16 @@ function terminarMision(){
       '<div style="font-size:17px; color:#6E5260;">Ya viven aquí los cinco amiguitos</div>';
     globo.textContent = "¡Lo lograste" + nombre + "! Ahora puedes jugar la Misión mezclada 🌈 y comprarles cosas en la tienda.";
     btnSeguir.textContent = "Seguir jugando ➜";
+  }else if(subida){
+    globo.textContent = "¡Subiste al nivel " + subida.nivel + " de " + subida.materia.nombre + nombre +
+      "! Desde la próxima misión las preguntas serán un poquito más desafiantes. ¡Tú puedes! 💪";
+    btnSeguir.textContent = "Seguir jugando ➜";
   }else if(premioRacha){
     globo.textContent = "¡" + premioRacha + " días seguidos jugando" + nombre + "! Te regalo 10 estrellas 🎉";
     btnSeguir.textContent = "Seguir jugando ➜";
   }else if(ESTADO.sesion.misiones >= 3){
     globo.textContent = "¡Llevamos " + ESTADO.sesion.misiones + " misiones" + nombre +
-      "! Yo ya tengo sueñito 🥱 ¿Seguimos mañana? Tu refugio te espera igual.";
+      "! Yo ya tengo sueñito 😴 ¿Seguimos mañana? Tu refugio te espera igual.";
     btnSeguir.textContent = "Una más ➜";
   }else{
     globo.textContent = nuevo
@@ -1052,7 +1253,7 @@ function pintarTienda(){
     grid.appendChild(b);
   });
   document.getElementById("globo-tienda").textContent =
-    "Tienes " + ESTADO.estrellas + " estrellas. Cada respuesta correcta te da una ⭐";
+    "Tienes " + ESTADO.estrellas + " estrellas. Si aciertas a la primera, ¡ganas el doble! ⭐";
 }
 
 function comprar(o){
@@ -1078,12 +1279,31 @@ function pintarReporte(){
   MATERIAS.forEach(function(m){
     const p = progresoDe(m.id);
     const temas = Object.keys(p.errores).sort(function(a,b){ return p.errores[b] - p.errores[a]; }).slice(0,3);
+    let botones = '<span class="niveles">';
+    for(let n = 1; n <= 3; n++){
+      botones += '<button data-materia="' + m.id + '" data-nivel="' + n + '"' + (p.nivel === n ? ' class="activo"' : '') +
+                 ' aria-label="Nivel ' + n + '">' + n + '</button>';
+    }
+    botones += '</span>';
     filas += "<tr><td><strong>" + m.nombre + "</strong><br><span style='color:#6E5260'>" +
       (temas.length ? "Le costó: " + temas.join(", ") : "Sin temas difíciles por ahora") +
-      "</span></td><td class='n'>" + (m.generado ? "sin límite" : p.respondidas + " / " + m.preguntas.length) + "</td></tr>";
+      "</span></td><td class='n'>" + botones + "</td></tr>";
   });
   document.getElementById("reporte").innerHTML =
-    '<table class="reporte"><tr><th>Asignatura</th><th class="n">Respondidas</th></tr>' + filas + '</table>';
+    '<table class="reporte"><tr><th>Asignatura</th><th class="n">Nivel</th></tr>' + filas + '</table>';
+  const bs = document.querySelectorAll("#reporte .niveles button");
+  for(let i = 0; i < bs.length; i++){
+    bs[i].addEventListener("click", function(){
+      const p = progresoDe(this.getAttribute("data-materia"));
+      p.nivel = Number(this.getAttribute("data-nivel"));
+      if(p.nivel > p.nivelMax) p.nivelMax = p.nivel;
+      p.ventana = [];
+      p.subio = 0;
+      guardar();
+      pintarReporte();
+      avisar("Listo: desde la próxima misión usa el nivel " + p.nivel + ".");
+    });
+  }
 }
 
 function exportar(){
@@ -1217,6 +1437,17 @@ document.getElementById("btn-salir-mision").addEventListener("click", function()
   if(confirm("¿Quieres dejar esta misión? Las estrellas que ya ganaste se quedan contigo.")){
     pintarMapa(); ir("p-mapa");
   }
+});
+document.getElementById("btn-desafio-si").addEventListener("click", function(){
+  const it = armarDesafio();
+  if(!it){ terminarMision(); return; }
+  mision.items.push(it);
+  mision.indice = mision.items.length - 1;
+  ir("p-juego");
+  pintarPregunta();
+});
+document.getElementById("btn-desafio-no").addEventListener("click", function(){
+  terminarMision();
 });
 document.getElementById("btn-seguir").addEventListener("click", function(){
   pintarMapa(); ir("p-mapa");
